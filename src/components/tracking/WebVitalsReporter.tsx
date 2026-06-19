@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
-import { onCLS, onINP, onLCP, onFCP, onTTFB, type Metric } from "web-vitals";
+import type { Metric } from "web-vitals";
 import { track, EVENTS } from "@/lib/analytics";
 
 /**
- * Reports Core Web Vitals to GA4. Page speed is both a ranking factor (SEO/AISEO)
- * and a conversion factor, so the optimizer watches these alongside conversion.
+ * Reports Core Web Vitals to GA4. The web-vitals library is dynamically imported
+ * so it's code-split out of the main bundle and only loaded after hydration.
  */
 export function WebVitalsReporter() {
   useEffect(() => {
+    let cancelled = false;
     const report = (metric: Metric) => {
       track(EVENTS.WEB_VITALS, {
         metric_name: metric.name,
@@ -19,11 +20,17 @@ export function WebVitalsReporter() {
         metric_rating: metric.rating,
       });
     };
-    onCLS(report);
-    onINP(report);
-    onLCP(report);
-    onFCP(report);
-    onTTFB(report);
+    import("web-vitals").then(({ onCLS, onINP, onLCP, onFCP, onTTFB }) => {
+      if (cancelled) return;
+      onCLS(report);
+      onINP(report);
+      onLCP(report);
+      onFCP(report);
+      onTTFB(report);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return null;

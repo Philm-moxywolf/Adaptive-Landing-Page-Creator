@@ -1,3 +1,4 @@
+import type Anthropic from "@anthropic-ai/sdk";
 import type { SiteConfig } from "../src/lib/types";
 import { completeText } from "./anthropic";
 
@@ -30,6 +31,22 @@ Find and summarize, with sources where possible:
 
 Keep it under ~600 words. Output markdown only.`;
 
-  const tools = [{ type: "web_search_20260209", name: "web_search" }];
-  return completeText({ system, user, tools, maxTokens: 8000 });
+  const tools: Anthropic.ToolUnion[] = [
+    { type: "web_search_20260209", name: "web_search" },
+  ];
+  const notes = await completeText({ system, user, tools, maxTokens: 8000 });
+  return sanitizeResearch(notes);
+}
+
+/**
+ * Research is assembled from arbitrary web pages (competitor sites, forums) — it
+ * is untrusted DATA, not instructions. Strip markup and cap size before it's fed
+ * to the rewrite; the prompt also frames it explicitly as reference-only.
+ */
+function sanitizeResearch(text: string): string {
+  return text
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s{3,}/g, " ")
+    .slice(0, 6000)
+    .trim();
 }

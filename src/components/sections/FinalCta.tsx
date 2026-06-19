@@ -17,13 +17,13 @@ export function FinalCta(props: Props) {
           <TrackedCTA
             cta={props.cta}
             location="final"
-            className="bg-bg text-ink hover:opacity-90"
+            className="bg-bg text-ink hover:opacity-90 focus-visible:ring-offset-brand"
           />
           {props.secondaryCta && (
             <TrackedCTA
               cta={props.secondaryCta}
               location="final"
-              className="border-brand-fg/40 bg-transparent text-brand-fg hover:bg-brand-fg/10"
+              className="border-brand-fg/40 bg-transparent text-brand-fg hover:bg-brand-fg/10 focus-visible:ring-brand-fg focus-visible:ring-offset-brand"
             />
           )}
         </div>

@@ -1,4 +1,5 @@
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
+import { EVENTS } from "../src/lib/analytics";
 
 /**
  * Pulls the last N days of GA4 data the optimizer needs to diagnose the funnel.
@@ -22,13 +23,15 @@ export interface Ga4Report {
   notes: string[];
 }
 
-const TRACKED_EVENTS = [
-  "cta_click",
-  "scroll_depth",
-  "form_start",
-  "form_submit",
-  "generate_lead",
-  "section_view",
+// Derived from the single source of truth in src/lib/analytics.ts so the reader
+// and the tracker can never drift apart.
+const TRACKED_EVENTS: string[] = [
+  EVENTS.CTA_CLICK,
+  EVENTS.SECTION_VIEW,
+  EVENTS.SCROLL_DEPTH,
+  EVENTS.FORM_START,
+  EVENTS.FORM_SUBMIT,
+  EVENTS.GENERATE_LEAD,
 ];
 
 function num(value: string | null | undefined): number {
@@ -93,7 +96,9 @@ export async function fetchGa4Report(
   const conversions = num(t[1]?.value);
   const engagementRate = num(t[2]?.value) * 100;
   const bounceRate = num(t[3]?.value) * 100;
-  const avgEngagementTime = num(t[4]?.value);
+  // GA4 metric is averageSessionDuration — named accurately to avoid confusion
+  // with "engagement time", which is a different GA4 metric.
+  const avgSessionDuration = num(t[4]?.value);
 
   // 2. Event counts by name.
   const events: Record<string, number> = {};
@@ -153,6 +158,11 @@ export async function fetchGa4Report(
       const c = num(row.metricValues?.[1]?.value);
       variants.push({ variant: v, sessions: s, conversions: c, cvr: s ? (c / s) * 100 : 0 });
     }
+    if (variants.length > 0) {
+      notes.push(
+        "Per-variant figures use an event-scoped `variant` dimension; register it user-scoped in GA4 for precise per-arm session/conversion rates.",
+      );
+    }
   } catch {
     notes.push(
       "No `variant` custom dimension registered in GA4 — per-variant conversion not available. Register it to enable A/B analysis.",
@@ -175,10 +185,13 @@ export async function fetchGa4Report(
       },
       limit: 20,
     });
+    // The tracker fires every crossed threshold, so any session reaching 90% also
+    // fires the 75% event. Count ONLY the 75 bucket to avoid double-counting deep
+    // sessions across the 75 and 90 buckets.
     let deep = 0;
     for (const row of sc.rows ?? []) {
       const pct = num(row.dimensionValues?.[0]?.value);
-      if (pct >= 75) deep += num(row.metricValues?.[0]?.value);
+      if (pct === 75) deep += num(row.metricValues?.[0]?.value);
     }
     scroll75Rate = sessions ? (deep / sessions) * 100 : null;
   } catch {
@@ -190,7 +203,7 @@ export async function fetchGa4Report(
     conversions,
     engagement_rate: engagementRate,
     bounce_rate: bounceRate,
-    avg_engagement_time: avgEngagementTime,
+    avg_session_duration: avgSessionDuration,
     cta_click_rate: sessions ? ((events["cta_click"] ?? 0) / sessions) * 100 : null,
     scroll_75_rate: scroll75Rate,
     form_completion_rate: events["form_start"]

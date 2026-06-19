@@ -171,6 +171,7 @@
         "title": "11-minute promise",
         "body": "If you're not looking at a real dashboard within 11 minutes, our team will build it with you on a call — free."
       },
+      "rating": { "value": 4.8, "count": 600 },
       "urgency": "",
       "cta": {
         "label": "Create my free workspace",

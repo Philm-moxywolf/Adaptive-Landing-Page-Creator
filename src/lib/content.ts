@@ -1,5 +1,10 @@
 import rawContent from "@content/landing.json";
-import { parseContent, type Content, type Section } from "./content-schema";
+import {
+  parseContent,
+  sectionSchema,
+  type Content,
+  type Section,
+} from "./content-schema";
 
 /**
  * Loads and validates the landing-page content, applying per-variant overrides.
@@ -22,7 +27,13 @@ export function getContent(variant?: string): Content {
   const overrides = experiment.overrides || {};
   const sections = content.sections.map((section) => {
     const override = overrides[section.id];
-    return override ? ({ ...section, ...override } as Section) : section;
+    if (!override) return section;
+    // Overrides are typed loosely (z.any()). Never let one change a section's
+    // identity/discriminant, and re-validate the shallow merge — a bad override
+    // falls back to the safe base rather than blanking or breaking the render.
+    const { id: _id, type: _type, ...safe } = override as Record<string, unknown>;
+    const merged = sectionSchema.safeParse({ ...section, ...safe });
+    return merged.success ? merged.data : section;
   });
   return { ...content, sections };
 }

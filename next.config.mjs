@@ -1,10 +1,31 @@
+/**
+ * Image optimization hosts are an explicit allowlist (NOT a wildcard) to avoid
+ * turning /_next/image into an open proxy. Allowed hosts are derived from the
+ * site URL plus an optional NEXT_PUBLIC_IMAGE_HOSTS env (comma-separated). With
+ * none set, only same-origin/local images are allowed — the safe default.
+ */
+const siteHost = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SITE_URL || "").hostname;
+  } catch {
+    return "";
+  }
+})();
+
+const imageHosts = [
+  ...new Set(
+    [siteHost, ...(process.env.NEXT_PUBLIC_IMAGE_HOSTS || "").split(",")]
+      .map((h) => h.trim())
+      .filter(Boolean),
+  ),
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // Allow optimized images from any host the client configures for their offer/proof assets.
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
+    remotePatterns: imageHosts.map((hostname) => ({ protocol: "https", hostname })),
   },
   async headers() {
     return [

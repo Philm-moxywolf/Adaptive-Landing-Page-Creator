@@ -3,41 +3,44 @@
 import Script from "next/script";
 
 /**
- * Loads GA4 (gtag.js) with Consent Mode v2. When a consent banner is enabled,
- * analytics/ads storage default to "denied" until the visitor accepts — the
- * privacy-correct default for EU/UK traffic. With the banner off, consent
- * defaults to granted.
+ * Loads GA4 (gtag.js) with Consent Mode v2. `initialConsent` is resolved on the
+ * server from the visitor's saved choice, so a returning visitor who already
+ * accepted is not reset to "denied" on first paint. The GA id is sanitized to a
+ * safe charset before it's interpolated into the inline script.
  */
 export function GoogleAnalytics({
   gaId,
-  enableConsentBanner,
+  initialConsent,
+  nonce,
 }: {
   gaId: string;
-  enableConsentBanner: boolean;
+  initialConsent: "granted" | "denied";
+  nonce?: string;
 }) {
-  if (!gaId) return null;
-  const def = enableConsentBanner ? "denied" : "granted";
+  const safeId = gaId.replace(/[^A-Za-z0-9-]/g, "");
+  if (!safeId) return null;
 
   return (
     <>
       <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(safeId)}`}
         strategy="afterInteractive"
+        nonce={nonce}
       />
-      <Script id="ga-init" strategy="afterInteractive">
+      <Script id="ga-init" strategy="afterInteractive" nonce={nonce}>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           window.gtag = gtag;
           gtag('js', new Date());
           gtag('consent', 'default', {
-            ad_storage: '${def}',
-            ad_user_data: '${def}',
-            ad_personalization: '${def}',
-            analytics_storage: '${def}',
+            ad_storage: '${initialConsent}',
+            ad_user_data: '${initialConsent}',
+            ad_personalization: '${initialConsent}',
+            analytics_storage: '${initialConsent}',
             wait_for_update: 500
           });
-          gtag('config', '${gaId}', { send_page_view: true });
+          gtag('config', '${safeId}', { send_page_view: true });
         `}
       </Script>
     </>

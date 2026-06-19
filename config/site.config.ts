@@ -58,6 +58,7 @@ export const siteConfig: SiteConfig = {
     defaultOgImage: "",
     twitterHandle: "@acme",
     locale: "en_US",
+    currency: "USD", // ISO 4217 — used in Product/Offer structured data
   },
 
   analytics: {

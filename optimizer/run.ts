@@ -60,8 +60,10 @@ async function main() {
     `\n  ${targetEval.achievedCount}/${targetEval.results.length} targets at stretch goal.\n`,
   );
 
-  if (targetEval.dataAvailable && targetEval.allAchieved) {
-    console.log("✓ All targets already beaten by 20%. No rewrite needed this week.");
+  // Only skip when EVERY configured target is measured AND beaten — otherwise an
+  // unmeasured target (e.g. no scroll/form data yet) could masquerade as "met".
+  if (targetEval.dataAvailable && targetEval.allAchieved && targetEval.fullCoverage) {
+    console.log("✓ All targets measured and already beaten by 20%. No rewrite needed this week.");
     writeReport(`${dateKey}.json`, {
       stamp,
       status: "all_targets_met",
@@ -105,7 +107,25 @@ async function main() {
     research,
   });
 
-  // 5. Merge bookkeeping + write
+  // 5. No-op guard — if the rewrite is identical to the current page (ignoring
+  // bookkeeping), don't bump the version, write, or open a churn PR. Both objects
+  // pass through the same schema, so key order is normalized and comparable.
+  const { _meta: _newMeta, ...newBody } = result.content;
+  const { _meta: _curMeta, ...currentBody } = content;
+  if (JSON.stringify(newBody) === JSON.stringify(currentBody)) {
+    console.log("✓ Optimizer produced no changes this week — nothing to ship.");
+    writeReport(`${dateKey}.json`, {
+      stamp,
+      status: "no_change",
+      model: OPTIMIZER_MODEL,
+      rationale: result.rationale,
+      targetEval,
+      report,
+    });
+    return;
+  }
+
+  // 6. Merge bookkeeping + write
   const priorChangelog = content._meta?.changelog ?? [];
   const newContent: Content = {
     ...result.content,

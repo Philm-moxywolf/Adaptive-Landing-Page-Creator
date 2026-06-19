@@ -9,7 +9,11 @@
 
 export const VARIANT_COOKIE = "lp_variant";
 
-/** Canonical event names. Keep in sync with optimizer/ga4.ts METRIC_LIBRARY. */
+/**
+ * Canonical event names — the single source of truth. optimizer/ga4.ts derives
+ * its TRACKED_EVENTS list from these, so adding an event here keeps the reader in
+ * sync automatically.
+ */
 export const EVENTS = {
   CTA_CLICK: "cta_click",
   SECTION_VIEW: "section_view",
@@ -31,6 +35,21 @@ export function getClientVariant(): string {
   return match ? decodeURIComponent(match[1]) : "A";
 }
 
+/**
+ * Queues a gtag command in the dataLayer using the `arguments` object — the exact
+ * shape gtag.js replays once it loads. A plain array pushed to dataLayer is NOT
+ * processed as a command, so this must use `arguments`, not `[...]`.
+ */
+function dataLayerPush(
+  _command: "event" | "config" | "consent",
+  _name: string,
+  _params: Record<string, unknown>,
+): void {
+  window.dataLayer = window.dataLayer || [];
+  // eslint-disable-next-line prefer-rest-params
+  window.dataLayer.push(arguments);
+}
+
 /** Fire a GA4 event with the experiment variant always attached. */
 export function track(
   name: EventName | string,
@@ -41,9 +60,8 @@ export function track(
   if (typeof window.gtag === "function") {
     window.gtag("event", name, payload);
   } else {
-    // Queue before gtag is ready; GA4 drains dataLayer on load.
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(["event", name, payload]);
+    // gtag not ready yet — queue in gtag's own format so it replays on load.
+    dataLayerPush("event", name, payload);
   }
 }
 

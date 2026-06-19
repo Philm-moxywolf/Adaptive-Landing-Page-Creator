@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getContent, enabledSections } from "@/lib/content";
-import { buildMetadata, buildJsonLd } from "@/lib/seo";
+import { buildMetadata, buildJsonLd, safeJsonLdString } from "@/lib/seo";
 import { siteConfig } from "@/lib/config";
 import { VARIANT_COOKIE } from "@/lib/analytics";
 import { SectionRenderer } from "@/components/sections/SectionRenderer";
@@ -12,8 +12,11 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function Page() {
-  const cookieStore = await cookies();
-  const variant = cookieStore.get(VARIANT_COOKIE)?.value;
+  const variant = siteConfig.experiment.enabled
+    ? (await cookies()).get(VARIANT_COOKIE)?.value
+    : undefined;
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   const content = getContent(variant);
   const sections = enabledSections(content);
   const jsonLd = buildJsonLd(content);
@@ -22,7 +25,8 @@ export default async function Page() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        nonce={nonce}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdString(jsonLd) }}
       />
       {sections.map((section) => (
         <SectionRenderer

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import type { Section } from "@/lib/content-schema";
 import { Eyebrow } from "@/components/ui/Primitives";
 import { track, EVENTS } from "@/lib/analytics";
@@ -12,15 +12,37 @@ type Props = Extract<Section, { type: "leadForm" }> & {
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
 export function LeadForm({ conversionEventName, ...props }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [startedTracked, setStartedTracked] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const successRef = useRef<HTMLDivElement>(null);
+
+  // Move focus to the confirmation when the form is replaced (a11y).
+  useEffect(() => {
+    if (status === "success") successRef.current?.focus();
+  }, [status]);
 
   function handleFirstInteraction() {
     if (!startedTracked) {
       setStartedTracked(true);
       track(EVENTS.FORM_START, { form_id: props.id });
     }
+  }
+
+  function validate(data: Record<string, unknown>): Record<string, string> {
+    const next: Record<string, string> = {};
+    for (const field of props.fields) {
+      const value = String(data[field.name] ?? "").trim();
+      if (field.required && !value) {
+        next[field.name] = `${field.label} is required.`;
+      } else if (field.type === "email" && value && !EMAIL_RE.test(value)) {
+        next[field.name] = "Enter a valid email address.";
+      }
+    }
+    return next;
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -34,7 +56,18 @@ export function LeadForm({ conversionEventName, ...props }: Props) {
       return;
     }
 
+    const validationErrors = validate(data);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      const firstInvalid = props.fields.find((f) => validationErrors[f.name]);
+      if (firstInvalid) {
+        document.getElementById(`${props.id}_${firstInvalid.name}`)?.focus();
+      }
+      return;
+    }
+    setErrors({});
     setStatus("submitting");
+
     try {
       const res = await fetch("/api/lead", {
         method: "POST",
@@ -55,7 +88,13 @@ export function LeadForm({ conversionEventName, ...props }: Props) {
     <div className="container-lp py-16 sm:py-24">
       <div className="mx-auto max-w-xl rounded-brand border border-line bg-surface p-8 shadow-sm">
         {status === "success" ? (
-          <div className="py-8 text-center" role="status" aria-live="polite">
+          <div
+            ref={successRef}
+            tabIndex={-1}
+            className="py-8 text-center focus-visible:outline-none"
+            role="status"
+            aria-live="polite"
+          >
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-success/15 text-success">
               <svg viewBox="0 0 20 20" fill="currentColor" className="h-7 w-7" aria-hidden="true">
                 <path
@@ -99,6 +138,15 @@ export function LeadForm({ conversionEventName, ...props }: Props) {
 
               {props.fields.map((field) => {
                 const fieldId = `${props.id}_${field.name}`;
+                const errorId = `${fieldId}-error`;
+                const error = errors[field.name];
+                const shared = {
+                  id: fieldId,
+                  name: field.name,
+                  required: field.required,
+                  "aria-invalid": error ? true : undefined,
+                  "aria-describedby": error ? errorId : undefined,
+                } as const;
                 return (
                   <div key={field.name} className="flex flex-col gap-1.5">
                     <label
@@ -115,18 +163,14 @@ export function LeadForm({ conversionEventName, ...props }: Props) {
                     </label>
                     {field.type === "textarea" ? (
                       <textarea
-                        id={fieldId}
-                        name={field.name}
-                        required={field.required}
+                        {...shared}
                         placeholder={field.placeholder}
                         rows={4}
-                        className="rounded-brand border border-line bg-bg px-4 py-3 text-ink placeholder:text-ink-muted/60 focus-visible:border-brand"
+                        className="rounded-brand border border-line bg-bg px-4 py-3 text-ink placeholder:text-ink-muted focus-visible:border-brand"
                       />
                     ) : field.type === "select" ? (
                       <select
-                        id={fieldId}
-                        name={field.name}
-                        required={field.required}
+                        {...shared}
                         defaultValue=""
                         className="rounded-brand border border-line bg-bg px-4 py-3 text-ink focus-visible:border-brand"
                       >
@@ -141,14 +185,17 @@ export function LeadForm({ conversionEventName, ...props }: Props) {
                       </select>
                     ) : (
                       <input
-                        id={fieldId}
-                        name={field.name}
+                        {...shared}
                         type={field.type}
-                        required={field.required}
                         placeholder={field.placeholder}
                         autoComplete={field.autoComplete}
-                        className="rounded-brand border border-line bg-bg px-4 py-3 text-ink placeholder:text-ink-muted/60 focus-visible:border-brand"
+                        className="rounded-brand border border-line bg-bg px-4 py-3 text-ink placeholder:text-ink-muted focus-visible:border-brand"
                       />
+                    )}
+                    {error && (
+                      <p id={errorId} role="alert" className="text-sm text-accent">
+                        {error}
+                      </p>
                     )}
                   </div>
                 );

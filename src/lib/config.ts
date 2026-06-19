@@ -8,6 +8,24 @@ export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || `https://${siteConfig.business.domain}`
 ).replace(/\/+$/, "");
 
+// Fail loud on a real production deploy (Vercel) if the placeholder domain was
+// never replaced — otherwise canonical URLs, sitemap, OG, and JSON-LD would all
+// silently point at example.com. Local/preview builds with the example are fine.
+if (process.env.VERCEL_ENV === "production") {
+  let host = "";
+  try {
+    host = new URL(SITE_URL).hostname;
+  } catch {
+    throw new Error(`Invalid SITE_URL: "${SITE_URL}". Set NEXT_PUBLIC_SITE_URL.`);
+  }
+  if (/(^|\.)example\.com$/i.test(host)) {
+    throw new Error(
+      "SITE_URL resolves to the placeholder 'example.com' in production. " +
+        "Set NEXT_PUBLIC_SITE_URL (or business.domain in config/site.config.ts) to your real domain.",
+    );
+  }
+}
+
 /** GA4 Measurement ID resolved from config first, then env. */
 export const GA4_ID =
   siteConfig.analytics.ga4MeasurementId ||

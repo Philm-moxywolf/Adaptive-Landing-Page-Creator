@@ -80,6 +80,8 @@ export interface SiteConfig {
     defaultOgImage?: string;
     twitterHandle?: string;
     locale: string;
+    /** ISO 4217 currency for Product/Offer structured data, e.g. "USD", "GBP". */
+    currency: string;
   };
   analytics: {
     /** GA4 Measurement ID. Falls back to NEXT_PUBLIC_GA4_MEASUREMENT_ID. */
@@ -149,13 +151,13 @@ export interface ConversionTarget {
   /** Stable key, e.g. "primary_cvr". */
   key: string;
   label: string;
-  /** The GA4-derived metric this maps to (see optimizer/ga4.ts METRIC_LIBRARY). */
+  /** The GA4-derived metric this maps to (computed in optimizer/ga4.ts `metrics`). */
   metric:
     | "conversion_rate"
     | "conversions"
     | "engagement_rate"
     | "bounce_rate"
-    | "avg_engagement_time"
+    | "avg_session_duration"
     | "cta_click_rate"
     | "scroll_75_rate"
     | "form_completion_rate";

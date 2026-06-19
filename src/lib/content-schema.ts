@@ -133,6 +133,10 @@ const offerSection = withBase({
   guarantee: z
     .object({ title: z.string(), body: z.string() })
     .optional(),
+  /** Real aggregate rating, if you have one. Emitted as schema.org AggregateRating. */
+  rating: z
+    .object({ value: z.number().min(0).max(5), count: z.number().int().min(1) })
+    .optional(),
   urgency: z.string().optional(),
   cta: ctaSchema,
 });
@@ -199,9 +203,11 @@ export const contentSchema = z.object({
   sections: z.array(sectionSchema).min(1),
   /**
    * Optional per-variant overrides keyed by variant id (e.g. "B"). Each override
-   * is a partial section keyed by section id; the renderer deep-merges it over the
-   * base section for visitors bucketed into that variant. The optimizer populates
-   * this when it wants to A/B test a change rather than ship it blind.
+   * is a partial section keyed by section id; the renderer SHALLOW-merges it over
+   * the base section (top-level field replace — nested fields like `cta`, `price`,
+   * `items[]` must be supplied whole). `id` and `type` cannot be overridden, and
+   * the merged section is re-validated against the schema before render (see
+   * src/lib/content.ts). The optimizer populates this to A/B test a change.
    */
   experiments: z
     .record(

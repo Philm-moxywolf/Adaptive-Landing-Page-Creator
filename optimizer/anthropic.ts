@@ -5,12 +5,9 @@ import Anthropic from "@anthropic-ai/sdk";
  *
  * Uses Claude Opus 4.8 with adaptive thinking + high effort — the right tier for
  * a weekly job that reasons over analytics, research, and CRO strategy to rewrite
- * a page. Streams (to avoid HTTP timeouts on large outputs) and handles the
- * `pause_turn` server-tool loop so web search can run to completion.
- *
- * Note: request params are cast to `any` at the SDK boundary so the build stays
- * resilient across SDK minor versions — the field shapes (adaptive thinking,
- * output_config.effort, web_search tool) are per the current Claude API docs.
+ * a page. Streams (to avoid HTTP timeouts on large outputs), accumulates text
+ * across the `pause_turn` server-tool loop (so web-search turns aren't lost), and
+ * throws loudly if the model ultimately produced nothing.
  */
 
 export const OPTIMIZER_MODEL = process.env.OPTIMIZER_MODEL || "claude-opus-4-8";
@@ -22,7 +19,7 @@ export function hasApiKey(): boolean {
 export interface CompleteArgs {
   system: string;
   user: string;
-  tools?: unknown[];
+  tools?: Anthropic.ToolUnion[];
   maxTokens?: number;
 }
 
@@ -33,13 +30,13 @@ export async function completeText({
   maxTokens = 32000,
 }: CompleteArgs): Promise<string> {
   const client = new Anthropic();
-  const messages: Array<{ role: "user" | "assistant"; content: unknown }> = [
-    { role: "user", content: user },
-  ];
+  const messages: Anthropic.MessageParam[] = [{ role: "user", content: user }];
 
-  let text = "";
+  const collected: string[] = [];
+  let lastStop: string | null = null;
+
   for (let i = 0; i < 8; i++) {
-    const params = {
+    const params: Anthropic.MessageStreamParams = {
       model: OPTIMIZER_MODEL,
       max_tokens: maxTokens,
       thinking: { type: "adaptive" },
@@ -49,21 +46,30 @@ export async function completeText({
       ...(tools ? { tools } : {}),
     };
 
-    const stream = client.messages.stream(params as never);
+    const stream = client.messages.stream(params);
     const msg = await stream.finalMessage();
+    lastStop = msg.stop_reason;
 
-    text = msg.content
+    const turnText = msg.content
       .filter((b): b is Anthropic.TextBlock => b.type === "text")
       .map((b) => b.text)
       .join("\n")
       .trim();
+    if (turnText) collected.push(turnText);
 
-    // Server-side tools (web search) may pause; resend to resume.
+    // Server-side tools (web search) may pause; resend to resume, keeping text.
     if (msg.stop_reason === "pause_turn") {
       messages.push({ role: "assistant", content: msg.content });
       continue;
     }
     break;
+  }
+
+  const text = collected.join("\n").trim();
+  if (!text) {
+    throw new Error(
+      `Model produced no text output (last stop_reason: ${lastStop ?? "none"}).`,
+    );
   }
   return text;
 }

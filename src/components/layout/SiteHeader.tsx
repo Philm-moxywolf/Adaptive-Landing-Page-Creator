@@ -8,7 +8,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-line bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/60">
       <div className="container-lp flex h-16 items-center justify-between">
         <a
-          href="#main"
+          href="/"
+          aria-label={`${siteConfig.business.name} — home`}
           className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink"
         >
           {logo.src ? (

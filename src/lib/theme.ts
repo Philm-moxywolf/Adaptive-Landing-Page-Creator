@@ -1,5 +1,14 @@
 import type { SiteConfig } from "./types";
 
+/**
+ * Sanitize a font-family name before it's injected into a CSS variable. Allows
+ * only safe font-name characters so a config value can't break out of the CSS
+ * string or inject extra declarations.
+ */
+function cssFontName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9 _-]/g, "").trim() || "sans-serif";
+}
+
 /** "#4f46e5" | "#abc" -> "79 70 229" (space-separated RGB for Tailwind alpha support). */
 export function hexToRgbTriplet(hex: string): string {
   const h = hex.replace("#", "").trim();
@@ -37,8 +46,8 @@ export function buildThemeCss(config: SiteConfig): string {
     "--line": hexToRgbTriplet(c.line),
     "--success": hexToRgbTriplet(c.success),
     "--radius": config.brand.radius,
-    "--font-sans": `'${config.brand.fonts.sans}'`,
-    "--font-display": `'${config.brand.fonts.display}'`,
+    "--font-sans": `'${cssFontName(config.brand.fonts.sans)}'`,
+    "--font-display": `'${cssFontName(config.brand.fonts.display)}'`,
   };
   const body = Object.entries(vars)
     .map(([k, v]) => `${k}:${v};`)

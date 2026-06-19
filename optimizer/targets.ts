@@ -23,6 +23,8 @@ export interface TargetsEvaluation {
   results: TargetAttainment[];
   allAchieved: boolean;
   achievedCount: number;
+  /** True only when EVERY configured target has data. */
+  fullCoverage: boolean;
 }
 
 export function evaluateTargets(
@@ -47,9 +49,13 @@ export function evaluateTargets(
       };
     }
 
-    const attainmentPct = higher
-      ? (current / goal) * 100
-      : (goal / current) * 100;
+    // Guard against divide-by-zero (e.g. bounce_rate of 0) producing Infinity.
+    let attainmentPct: number;
+    if (higher) {
+      attainmentPct = goal > 0 ? (current / goal) * 100 : 100;
+    } else {
+      attainmentPct = current > 0 ? (goal / current) * 100 : 100;
+    }
     const achieved = higher ? current >= goal : current <= goal;
 
     return { target, current, goal, attainmentPct, achieved };
@@ -63,6 +69,7 @@ export function evaluateTargets(
     results,
     allAchieved: withData.length > 0 && withData.every((r) => r.achieved),
     achievedCount,
+    fullCoverage: withData.length === results.length,
   };
 }
 
