@@ -24,6 +24,8 @@ It's built to convert cold traffic from *any* source — paid ads, SEO, AI searc
 
 ---
 
+> **First time? → [Go-live guide](docs/GO-LIVE.md)** — the complete click-by-click walkthrough, ~30 minutes, no coding required.
+
 ## Run it from Claude Code (the console)
 
 Open this repo in **Claude Code** and say _"set up my landing page."_ A control
@@ -93,6 +95,8 @@ until every metric beats **120% of its target**. Details + the "120%" definition
 
 ## Docs
 
+- **[`docs/GO-LIVE.md`](docs/GO-LIVE.md) — the complete click-by-click walkthrough (start here).**
+- [`docs/GIFT-SETUP.md`](docs/GIFT-SETUP.md) — the short setup overview.
 - [`docs/SETUP.md`](docs/SETUP.md) — step-by-step: accounts, env vars, deploy, enable the Action.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how the engine fits together.
 - [`docs/CONTENT_GUIDE.md`](docs/CONTENT_GUIDE.md) — writing content + every section type.

@@ -48,4 +48,5 @@ Set your goals in `config/targets.config.ts`, then the weekly optimizer pushes e
 - **Your secrets stay yours.** Front-end values live as Vercel env vars; the optimizer's secrets live as GitHub Actions secrets in *your* repo. Nothing is shared.
 - **`NEXT_PUBLIC_SITE_URL` is required in production** — the build deliberately fails if it's left as the placeholder, so you can't accidentally ship a half-configured page.
 - **The weekly AI is optional.** The page works and tracks with just Vercel + a GA4 Measurement ID. Add the Anthropic key + GA service account only when you want the weekly optimization (and its small cost) to start.
+- **Complete click-by-click walkthrough:** [docs/GO-LIVE.md](GO-LIVE.md) — every step with diagrams, written so anyone can follow it.
 - **Full reference:** `docs/SETUP.md` (every field/step), `docs/OPTIMIZER.md` (the weekly loop), `docs/CONTENT_GUIDE.md` (writing copy), `docs/ARCHITECTURE.md` (how it fits together).

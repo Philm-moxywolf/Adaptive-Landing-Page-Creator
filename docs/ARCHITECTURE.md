@@ -4,6 +4,17 @@ The guiding principle: **the engine is generic; everything client-specific is da
 A client re-skins, re-targets, and re-words the whole page by editing `config/` and
 `content/` — never `src/`.
 
+```mermaid
+flowchart TB
+    cfg["config/ + content/<br/>(you edit only these)"] --> page["Engine — src/<br/>page + tracking + SEO (generic)"]
+    page --> vercel["Vercel<br/>hosting"]
+    page -->|"events"| ga["Google Analytics"]
+    ga -->|"every Saturday"| action["Optimizer<br/>GitHub Action"]
+    action -->|"opens PR → preview"| vercel
+    console["Claude Code console<br/>.claude/skills/landing-console"] -.->|"connect · deploy · sign-off"| vercel
+    console -.-> action
+```
+
 ```
 ┌─ Client edits ───────────────────────────────────────────────┐
 │  config/site.config.ts   brand · business · GA4 · strategy    │
