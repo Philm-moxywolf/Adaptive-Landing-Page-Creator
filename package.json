@@ -10,7 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "optimize": "tsx optimizer/run.ts",
-    "optimize:dry": "tsx optimizer/run.ts --dry-run"
+    "optimize:dry": "tsx optimizer/run.ts --dry-run",
+    "test": "tsx --test tests/logic.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",

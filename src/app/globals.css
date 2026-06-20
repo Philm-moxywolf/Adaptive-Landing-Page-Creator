@@ -20,7 +20,9 @@
   h2,
   h3,
   h4 {
-    @apply font-display tracking-tight text-ink;
+    /* Inherit color (don't force text-ink) so headings on a colored block —
+       e.g. the brand-colored final CTA — pick up that block's text color. */
+    @apply font-display tracking-tight;
     text-wrap: balance;
   }
 
