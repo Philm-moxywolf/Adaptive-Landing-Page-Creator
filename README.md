@@ -24,6 +24,24 @@ It's built to convert cold traffic from *any* source — paid ads, SEO, AI searc
 
 ---
 
+## Run it from Claude Code (the console)
+
+Open this repo in **Claude Code** and say _"set up my landing page."_ A control
+console appears that walks you through connecting **your own** GitHub, Vercel, and
+Google Analytics, deploying, and approving the weekly optimizer's edits — all from
+chat, all on your accounts, nothing routed through anyone else. New here? See
+[docs/GIFT-SETUP.md](docs/GIFT-SETUP.md).
+
+## Deploy in one click
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPhilm-moxywolf%2FAdaptive-Landing-Page-Creator&env=NEXT_PUBLIC_SITE_URL,NEXT_PUBLIC_GA4_MEASUREMENT_ID&envDescription=Your%20public%20site%20URL%20and%20GA4%20Measurement%20ID&envLink=https%3A%2F%2Fgithub.com%2FPhilm-moxywolf%2FAdaptive-Landing-Page-Creator%2Fblob%2Fmain%2F.env.example)
+
+One click clones this into your GitHub, creates the Vercel project, prompts for the
+runtime env vars, and ships the first deploy — then every push auto-deploys.
+*(The repo must be public for the clone flow. The weekly optimizer's secrets —
+`ANTHROPIC_API_KEY`, `GA4_PROPERTY_ID`, `GA4_SERVICE_ACCOUNT_JSON` — are GitHub
+Actions secrets, set separately; the console does this for you.)*
+
 ## The two files you edit
 
 | File | What it controls |
