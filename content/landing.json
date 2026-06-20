@@ -1,180 +1,195 @@
 {
   "meta": {
-    "title": "Cut monthly reporting from days to minutes",
-    "description": "Acme turns your scattered spreadsheets into board-ready dashboards in minutes. Start free — no credit card, no analyst, no setup project.",
+    "title": "Find the 3 automations worth the most hours to your business",
+    "description": "A free 30-minute AI Opportunity Audit for teams of 10–250. We map the 3 automations worth the most hours to your business and hand you a plain-English plan — yours to keep, with or without us.",
     "keywords": [
-      "automated reporting",
-      "spreadsheet dashboards",
-      "operations analytics",
-      "board reporting tool"
+      "AI opportunity audit",
+      "AI automation for small business",
+      "free AI audit SMB",
+      "business automation consulting",
+      "where to start with AI"
     ],
-    "ogImageAlt": "Acme dashboard turning a spreadsheet into a board-ready report"
+    "ogImageAlt": "ElevateAI AI Opportunity Audit — three prioritized automations on a plain-English plan"
   },
   "sections": [
     {
       "id": "hero",
+      "enabled": true,
       "type": "hero",
-      "eyebrow": "For ops & finance teams drowning in spreadsheets",
-      "headline": "Your monthly report, done in minutes — not days",
-      "subhead": "Acme connects your spreadsheets and tools, then builds the board-ready dashboard for you. No analyst to hire. No setup project. No formulas to babysit.",
+      "eyebrow": "Free 30-minute AI Opportunity Audit · For teams of 10–250",
+      "headline": "You don't need an AI strategy. You need to know which three things to automate first.",
+      "subhead": "You suspect AI could save your team real time. In 30 minutes we show you exactly where — the 3 automations worth the most hours to your specific business, ranked, in plain English. You keep the plan whether or not we ever work together.",
       "bullets": [
-        "Live dashboards from the spreadsheets you already use",
-        "Setup in under 11 minutes — guided, not a project",
-        "Share a link execs actually understand"
+        "No tech team and no clean data required to start",
+        "A prioritized plan you can run yourself or hand to us"
       ],
       "primaryCta": {
-        "label": "Start free — no credit card",
+        "label": "Get my free AI audit",
         "href": "#lead",
         "kind": "primary",
-        "trackingId": "hero_primary"
+        "trackingId": "hero_primary",
+        "ariaLabel": "Get my free AI Opportunity Audit — go to the lead form"
       },
       "secondaryCta": {
-        "label": "See a 90-second demo",
+        "label": "See how the audit works",
         "href": "#how",
         "kind": "secondary",
-        "trackingId": "hero_demo"
+        "trackingId": "hero_how"
       },
-      "trust": "No credit card · Free forever plan · 4,000+ teams"
+      "trust": "Free · No obligation · No sales pitch · Plan is yours to keep"
     },
     {
-      "id": "logos",
-      "type": "logos",
-      "title": "Trusted by operations teams at",
-      "logos": [
-        { "name": "Northwind" },
-        { "name": "Globex" },
-        { "name": "Initech" },
-        { "name": "Umbrella" },
-        { "name": "Hooli" }
+      "id": "stats",
+      "enabled": true,
+      "type": "stats",
+      "title": "What our audits typically surface",
+      "items": [
+        {
+          "value": "40+",
+          "label": "SMBs audited"
+        },
+        {
+          "value": "5–15 hrs/wk",
+          "label": "typically reclaimable across 3–5 automations"
+        },
+        {
+          "value": "~2 weeks",
+          "label": "to ship the first automation, on average"
+        }
       ]
     },
     {
       "id": "problem",
+      "enabled": true,
       "type": "problem",
-      "eyebrow": "The monthly grind",
-      "headline": "Reporting eats your week and you still don't trust the numbers",
-      "body": "Every month it's the same: chase the data, fix the formulas, rebuild the deck, and hope nobody asks how a number was calculated.",
+      "eyebrow": "The real starting line",
+      "headline": "The problem isn't your team. It's that the same work gets done by hand every week.",
+      "body": "Email, scheduling, invoicing, follow-ups, reporting, the same customer questions answered again and again. You know hours are leaking. You just don't know which fix is worth doing first — or whether AI even applies to a business like yours.",
       "pains": [
         {
-          "title": "Days lost to copy-paste",
-          "body": "Stitching exports together by hand, every single month."
+          "title": "Hours disappear into repeat work",
+          "body": "Re-keying invoice data, chasing approvals, answering the same customer questions, rebuilding the same monthly report by hand — week after week, for every person on the team."
         },
         {
-          "title": "One broken formula = wrong board deck",
-          "body": "A single dragged cell and the whole report is off — and you find out in the meeting."
+          "title": "Too much hype, no clear next step",
+          "body": "Everyone says you should be using AI. Nobody tells you which three things to actually do, in order."
         },
         {
-          "title": "Hiring an analyst isn't an option",
-          "body": "You need the output now, not a 3-month hire and onboarding."
+          "title": "No in-house AI person to ask",
+          "body": "You don't have someone to map this out, and you don't want to hire a project to find out where to begin."
         }
       ]
     },
     {
       "id": "features",
+      "enabled": true,
       "type": "features",
-      "eyebrow": "How Acme helps",
-      "headline": "Board-ready reporting without the busywork",
-      "subhead": "Connect once. Acme keeps every dashboard live and correct.",
+      "eyebrow": "What you walk away with",
+      "headline": "A short, ranked plan — not a sales deck",
+      "subhead": "Three specific automations for your business, in plain English, with what each one is worth in hours.",
       "items": [
         {
-          "title": "Connect your spreadsheets",
-          "body": "Google Sheets, Excel, CSV, and 40+ tools. No data warehouse required."
+          "title": "The 3 automations worth the most hours",
+          "body": "We map the three automations most worth doing in your business, ranked by the hours they give back so you know exactly what to do first.",
+          "icon": "target"
         },
         {
-          "title": "Auto-built dashboards",
-          "body": "Acme detects your metrics and assembles the views execs expect — editable anytime."
+          "title": "Quantified in hours, not hype",
+          "body": "Each opportunity comes with an estimate of the time it could give back each week — no revenue promises, no buzzwords."
         },
         {
-          "title": "Always current",
-          "body": "Numbers refresh on a schedule you set. No more month-end scramble."
+          "title": "Plain-English implementation plan",
+          "body": "Written so your existing team can read it and act on it. No jargon, no tools you have to buy just to understand the plan."
         },
         {
-          "title": "Share a link, not a 40MB deck",
-          "body": "Send a live, permissioned link. Comments and context travel with it."
+          "title": "Yours to keep, with or without us",
+          "body": "Run the plan yourself, or have us help. Either way the plan is yours — no follow-up pressure, no strings."
         }
       ]
     },
     {
       "id": "how",
+      "enabled": true,
       "type": "howItWorks",
-      "eyebrow": "Live in minutes",
-      "headline": "From spreadsheet to board deck in three steps",
+      "eyebrow": "How the audit works",
+      "headline": "Three steps, starting with one 30-minute call",
       "steps": [
         {
-          "title": "1 · Connect",
-          "body": "Link your spreadsheet or tool with one click. Acme reads the structure for you."
+          "title": "1 · Tell us your biggest time-sink",
+          "body": "Fill in the short form below. We come to the call already thinking about the one task that eats the most of your week."
         },
         {
-          "title": "2 · Review",
-          "body": "Acme proposes a dashboard. Tweak labels and grouping in plain language."
+          "title": "2 · 30 minutes on a call",
+          "body": "We ask about how your team actually works, then map where automation pays off — and, just as honestly, where it doesn't."
         },
         {
-          "title": "3 · Share",
-          "body": "Publish a live link or schedule a recurring report. Done — and it stays done."
+          "title": "3 · Get your prioritized plan",
+          "body": "You leave with the 3 automations worth the most hours, ranked, in plain English. Run it yourself or with us — your call."
         }
       ],
       "cta": {
-        "label": "Build my first dashboard free",
+        "label": "Get my free AI audit",
         "href": "#lead",
         "kind": "primary",
         "trackingId": "how_cta"
       }
     },
     {
-      "id": "stats",
-      "type": "stats",
-      "title": "What teams see after switching",
-      "items": [
-        { "value": "80%", "label": "less time on monthly reporting" },
-        { "value": "11 min", "label": "average time to first dashboard" },
-        { "value": "4.8/5", "label": "across 600+ reviews" }
-      ]
-    },
-    {
       "id": "testimonials",
+      "enabled": true,
       "type": "testimonials",
-      "eyebrow": "Don't take our word for it",
-      "headline": "Ops leaders got their week back",
+      "eyebrow": "What this is, and what it isn't",
+      "headline": "Built for people who are tired of AI hype",
       "items": [
         {
-          "quote": "I used to lose three days a month to the board deck. Now it builds itself and I spend that time on actual analysis.",
-          "name": "Priya N.",
-          "role": "Head of Operations",
-          "company": "Northwind"
+          "quote": "No buzzwords, no countdown timers, no 'unlock the power of AI.' Just the three things worth automating in your business, and what each one is worth in hours.",
+          "name": "How we run every audit",
+          "role": "The ElevateAI promise"
         },
         {
-          "quote": "We almost hired an analyst. Acme cost a fraction and was live the same afternoon.",
-          "name": "Marcus T.",
-          "role": "Finance Lead",
-          "company": "Globex"
+          "quote": "No bot to replace your team. No $50k transformation. We map specific, human-in-the-loop automations that give your people their time back — and we'll tell you where AI isn't worth it.",
+          "name": "What the audit is not",
+          "role": "Our guardrails, in plain terms"
         }
       ]
     },
     {
       "id": "offer",
+      "enabled": true,
       "type": "offer",
-      "eyebrow": "Start free",
-      "headline": "Get your first board-ready dashboard today",
-      "subhead": "Free forever for your first workspace. Upgrade only when your team grows.",
+      "eyebrow": "The offer",
+      "headline": "A free, bounded service — not a foot in the door",
+      "subhead": "30 minutes on a call. We come prepared. You leave with three ranked, plain-English automations and the time each could save. Nothing to buy to find out.",
       "price": {
         "amount": "$0",
-        "period": "to start",
-        "note": "Paid plans from $39/mo — no credit card to begin."
+        "period": "/ free audit",
+        "note": "30-minute call · prioritized plan included · no card, no commitment"
       },
       "includes": [
-        { "title": "Unlimited dashboards on your first workspace" },
-        { "title": "40+ spreadsheet & tool connectors" },
-        { "title": "Scheduled refresh & share links" },
-        { "title": "Guided 11-minute setup" }
+        {
+          "title": "30-minute AI Opportunity Audit call",
+          "body": "We come prepared with ideas for your specific bottleneck."
+        },
+        {
+          "title": "The 3 automations worth the most hours, ranked",
+          "body": "Prioritized by the hours they give back so you know what to do first."
+        },
+        {
+          "title": "Plain-English implementation plan",
+          "body": "Runnable by your existing team — yours to keep."
+        },
+        {
+          "title": "An honest view of where AI doesn't pay off",
+          "body": "We'll tell you what to skip, not just what to buy."
+        }
       ],
       "guarantee": {
-        "title": "11-minute promise",
-        "body": "If you're not looking at a real dashboard within 11 minutes, our team will build it with you on a call — free."
+        "title": "Free, no obligation, no sales pitch",
+        "body": "You leave with a prioritized plan whether or not you ever work with us. No pressure, no strings — run it yourself or hand it to us, entirely your call."
       },
-      "rating": { "value": 4.8, "count": 600 },
-      "urgency": "",
+      "urgency": "Each audit is prepared by hand, so we take a small number per week — booking links go out in the order forms arrive.",
       "cta": {
-        "label": "Create my free workspace",
+        "label": "Get my free AI audit",
         "href": "#lead",
         "kind": "primary",
         "trackingId": "offer_cta"
@@ -182,78 +197,114 @@
     },
     {
       "id": "faq",
+      "enabled": true,
       "type": "faq",
-      "eyebrow": "Questions",
-      "headline": "Everything you're wondering",
+      "eyebrow": "Honest answers",
+      "headline": "The questions skeptics actually ask",
       "items": [
         {
-          "q": "Do I need clean or structured data?",
-          "a": "No. Acme handles messy, real-world spreadsheets and will flag anything it can't read so you can fix it in seconds."
+          "q": "Is this a sales pitch in disguise?",
+          "a": "No. The call is a working session, and you keep the prioritized plan whether or not we ever work together. If we're not a fit to help you build, we'll say so."
         },
         {
-          "q": "How long does setup really take?",
-          "a": "Most teams have their first live dashboard in under 11 minutes. It's guided, not a project."
+          "q": "We're a small team — is AI even applicable to us?",
+          "a": "That's exactly what the audit answers. We look at how your business actually runs and find the three places automation pays off for a team your size — or tell you honestly if now isn't the time."
         },
         {
-          "q": "Is it actually free?",
-          "a": "Yes — your first workspace is free forever, no credit card. Paid plans start at $39/mo when you need more seats or workspaces."
+          "q": "Our data is a mess. Do we need to clean it up first?",
+          "a": "No. You don't need clean or organized data to start. We work with what you have and factor the real state of your data into the plan."
         },
         {
-          "q": "What if my tools aren't supported?",
-          "a": "We support 40+ connectors plus CSV/Excel import. Tell us what you use and we'll point you to the fastest path."
+          "q": "We don't have an AI person. Can our team actually run this?",
+          "a": "Yes. The plan is written in plain English for your existing team. There's no jargon to decode and nothing you have to buy just to understand it."
+        },
+        {
+          "q": "Will you try to replace our staff with bots?",
+          "a": "No. We map human-in-the-loop automations that give your people time back. We don't pitch fully autonomous systems or replacing your team."
+        },
+        {
+          "q": "What happens to the information we share?",
+          "a": "We use it only to prepare and book your audit. We don't sell it, and we don't feed what you share into any public AI tool."
+        },
+        {
+          "q": "How long does it take?",
+          "a": "The call is 30 minutes. After it, you walk away with your ranked plan, and most teams ship their first automation within about two weeks."
         }
       ]
     },
     {
       "id": "lead",
+      "enabled": true,
       "type": "leadForm",
-      "eyebrow": "Start free",
-      "headline": "Create your free workspace",
-      "subhead": "Takes a minute. No credit card. We'll have your first dashboard ready to build.",
+      "eyebrow": "Start your free audit",
+      "headline": "Get the 3 automations worth the most hours to your business",
+      "subhead": "Takes under a minute. Tell us your biggest time-sink and we'll come to the call with ideas for that specific one. We'll email your booking link right away — no calendar gymnastics.",
       "fields": [
         {
           "name": "name",
           "label": "Full name",
           "type": "text",
           "required": true,
-          "autoComplete": "name",
-          "placeholder": "Alex Rivera"
+          "placeholder": "Alex Rivera",
+          "autoComplete": "name"
         },
         {
           "name": "email",
           "label": "Work email",
           "type": "email",
           "required": true,
-          "autoComplete": "email",
-          "placeholder": "alex@company.com"
+          "placeholder": "alex@company.com",
+          "autoComplete": "email"
         },
         {
-          "name": "company_size",
-          "label": "Team size",
-          "type": "select",
+          "name": "company",
+          "label": "Company",
+          "type": "text",
           "required": false,
-          "options": ["1–20", "21–50", "51–200", "200+"]
+          "placeholder": "Company name",
+          "autoComplete": "organization"
+        },
+        {
+          "name": "timesink",
+          "label": "What's the one task that eats the most time each week?",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "e.g. answering the same customer questions, chasing invoices, building the monthly report"
         }
       ],
-      "submitLabel": "Create my free workspace",
-      "successMessage": "You're in — check your inbox for the link to build your first dashboard.",
-      "consentText": "By submitting you agree to our terms and privacy policy. We never sell your data."
+      "submitLabel": "Get my free AI audit",
+      "successMessage": "Got it — your booking link is on its way to your inbox. Pick a 30-minute slot and we'll come prepared with ideas for the time-sink you described.",
+      "consentText": "We use your details only to prepare and book your audit. We don't sell them, and we don't put anything you share into any public AI tool."
     },
     {
       "id": "final",
+      "enabled": true,
       "type": "finalCta",
-      "headline": "Get your week back, starting this month",
-      "subhead": "Join 4,000+ teams who stopped dreading the monthly report.",
+      "headline": "In 30 minutes, know exactly where AI saves you time",
+      "subhead": "Three ranked automations, in plain English, yours to keep. Free, no obligation, no sales pitch.",
       "cta": {
-        "label": "Start free — no credit card",
+        "label": "Get my free AI audit",
         "href": "#lead",
         "kind": "primary",
         "trackingId": "final_cta"
+      },
+      "secondaryCta": {
+        "label": "Read the questions skeptics ask",
+        "href": "#faq",
+        "kind": "secondary",
+        "trackingId": "final_faq"
       }
     }
   ],
   "_meta": {
-    "version": 1,
-    "changelog": ["Initial seed content (example offer)."]
+    "version": 2,
+    "changelog": [
+      "Initial ElevateAI 'AI Opportunity Audit' book-a-call page.",
+      "PROOF TO CONFIRM BEFORE GOING LIVE: stats section figures ('40+ SMBs audited', '5–15 hrs/wk across 3–5 automations', '~2 weeks to first automation') are placeholders from allowed proof and must be human-verified before publish. The visitor-facing stats title no longer contains this note.",
+      "Voice/compliance: copy avoids revenue/ROI figures, 'replace staff'/'autonomous' claims, named clients, and fake certs/partnerships per brief. Hours-saved is the only quantified payoff axis.",
+      "Brand palette set to a trustworthy teal/aqua scheme (brand #0F4C5C, accent #2EC4B6), replacing the default indigo.",
+      "v2 — applied review fixes. HIGH: removed offer.rating (fabricated 4.9/40 AggregateRating, invisible to users, no allowed proof) so seo.ts emits no aggregateRating; removed '(figures are placeholders...)' from the visible stats title; replaced fake-scarcity urgency with a truthful by-hand-capacity line. MED: rewrote consentText as a concrete first-person privacy statement with no dangling 'privacy policy' link (no /privacy route exists in the build); de-jargoned 'highest-ROI' to 'worth the most hours' in hero, features, how, offer, lead form, meta and seo; cut redundant hero bullet 3 (duplicate of trust line); reframed testimonials items as positioning labels (role carries the manifesto label) to reduce fake-quote read; anchored a problem pain in named workflows mirroring the form placeholder; reconciled timing claims to the allowed '2 weeks to first automation' proof (removed 'about a week start to finish').",
+      "STILL OPEN FOR HUMAN/ENG (not content-only): testimonials component still renders avatar initials + quote marks (Testimonials.tsx) — to fully kill the fake-quote read, drop the avatar/figcaption treatment or change the section type; consentText could link to a real /privacy page once one exists; consider rendering a scheduler inline on the lead-form success state and instrumenting a distinct booked-call event so the optimizer rewards bookings, not form fills."
+    ]
   }
 }
