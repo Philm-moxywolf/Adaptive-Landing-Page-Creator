@@ -1,0 +1,40 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+.vercel
+*.tsbuildinfo
+
+# Claude Code local state — the landing-console skill IS shipped; these are machine-local
+.claude/settings.local.json
+.claude/launch.json
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files (NEVER commit secrets)
+.env
+.env*.local
+.env.local
+
+# Google service-account key for the GA4 optimizer — keep OUT of git
+/optimizer/.secrets/
+ga4-service-account*.json
+
+# optimizer run artifacts
+/optimizer/reports/*.json
+!/optimizer/reports/.gitkeep

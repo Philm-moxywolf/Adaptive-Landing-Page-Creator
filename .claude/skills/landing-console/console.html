@@ -1,0 +1,83 @@
+<h2 class="sr-only">Landing page control panel: account connections, a deploy button, and this week's proposed edits awaiting sign-off.</h2>
+<style>
+.con-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem}
+.pill{font-size:12px;padding:3px 10px;border-radius:var(--border-radius-md);display:inline-flex;align-items:center;gap:4px}
+.steplab{font-size:13px;color:var(--color-text-secondary);margin:1.5rem 0 .6rem}
+.prim{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info)}
+.ok{background:var(--color-background-success);border-color:var(--color-border-success);color:var(--color-text-success)}
+</style>
+<div style="padding:.5rem 0">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <i class="ti ti-layout-navbar" style="font-size:22px;color:var(--color-text-info)" aria-hidden="true"></i>
+      <div>
+        <div style="font-size:16px;font-weight:500">Landing page console</div>
+        <div style="font-size:13px;color:var(--color-text-secondary)">runs in your Claude Code · on your accounts</div>
+      </div>
+    </div>
+    <span class="pill" style="background:var(--color-background-secondary);color:var(--color-text-secondary)"><i class="ti ti-circle-dot" aria-hidden="true"></i> setup</span>
+  </div>
+
+  <p class="steplab">1 · Connect your accounts</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+
+    <div class="con-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <i class="ti ti-brand-github" style="font-size:20px" aria-hidden="true"></i>
+        <span style="font-size:14px;font-weight:500">GitHub</span>
+      </div>
+      <button onclick="sendPrompt('Connect GitHub for my landing page')">Connect ↗</button>
+    </div>
+
+    <div class="con-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <i class="ti ti-triangle-inverted" style="font-size:20px" aria-hidden="true"></i>
+        <span style="font-size:14px;font-weight:500">Vercel</span>
+      </div>
+      <button onclick="sendPrompt('Connect my Vercel account')">Connect ↗</button>
+    </div>
+
+    <div class="con-card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <i class="ti ti-chart-dots" style="font-size:20px" aria-hidden="true"></i>
+        <span style="font-size:14px;font-weight:500">Google Analytics</span>
+      </div>
+      <button onclick="sendPrompt('Connect my Google Analytics')">Connect ↗</button>
+    </div>
+
+  </div>
+
+  <p class="steplab">2 · Deploy</p>
+  <div class="con-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <i class="ti ti-rocket" style="font-size:20px;color:var(--color-text-info)" aria-hidden="true"></i>
+      <div>
+        <div style="font-size:14px;font-weight:500">Go live on Vercel</div>
+        <div style="font-size:13px;color:var(--color-text-tertiary)">connect Vercel first</div>
+      </div>
+    </div>
+    <button class="prim" style="min-width:150px" onclick="sendPrompt('Deploy my landing page now')">Deploy now ↗</button>
+  </div>
+
+  <p class="steplab">3 · This week's proposed edits</p>
+  <div class="con-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <i class="ti ti-pencil" style="font-size:18px" aria-hidden="true"></i>
+        <span style="font-size:14px;font-weight:500">Saturday optimizer</span>
+      </div>
+      <span class="pill" style="background:var(--color-background-secondary);color:var(--color-text-secondary)"><i class="ti ti-clock" aria-hidden="true"></i> nothing pending</span>
+    </div>
+    <div style="font-size:14px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:14px">
+      No proposed edits yet. Each Saturday the optimizer reads your analytics, rewrites the page, and opens a pull request for you to review here.
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ok" onclick="sendPrompt('Show me this weeks proposed edits so I can review and approve them')">Review &amp; approve ↗</button>
+      <button onclick="sendPrompt('Show me the diff of this weeks proposed changes')">View diff ↗</button>
+      <button onclick="sendPrompt('Skip this weeks optimizer changes')">Skip ↗</button>
+    </div>
+    <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:12px">Runs every Saturday · nothing goes live without your approval</div>
+  </div>
+
+</div>
