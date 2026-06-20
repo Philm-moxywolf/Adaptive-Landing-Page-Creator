@@ -15,13 +15,22 @@ You are the operator console for this self-optimizing landing page. Everything r
 
 ## Step 1 — Detect state (read-only)
 
-Run these to learn what's already done, then reflect it in the console. Don't change anything yet.
+FIRST check which tools exist — never assume `gh` or `vercel` are installed:
+
+```bash
+command -v gh || echo "gh: NOT installed"
+command -v vercel || echo "vercel: NOT installed"
+```
+
+If `gh` is missing, don't treat it as an error: tell the user it's optional, and offer to either install it (`brew install gh` on macOS, then `gh auth login`) or do the GitHub steps in the browser (web links are given in each action below). Same for `vercel` — every step has a one-click web alternative.
+
+Then learn what's already done (skip the `gh`/`vercel` lines if those tools are absent):
 
 ```bash
 gh auth status                 # is GitHub CLI authed?
 git remote -v                  # is there an origin, and is it the user's own repo?
 gh repo view --json nameWithOwner,visibility 2>/dev/null
-gh secret list 2>/dev/null     # are ANTHROPIC_API_KEY / GA4_PROPERTY_ID / GA4_SERVICE_ACCOUNT_JSON set?
+gh secret list 2>/dev/null     # ANTHROPIC_API_KEY / GA4_PROPERTY_ID / GA4_SERVICE_ACCOUNT_JSON set?
 test -f .vercel/project.json && echo "vercel: linked" || echo "vercel: not linked"
 ```
 
@@ -47,26 +56,28 @@ Either way, then do whatever the user picks.
 ## Actions
 
 ### Connect GitHub
+**No `gh`?** Do this in the browser instead: fork via GitHub "Use this template", add secrets at repo → Settings → Secrets and variables → Actions → New repository secret, and tick repo → Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests". Same result as the commands below.
+
 1. `gh auth status` — if not authed, guide `gh auth login`.
-2. Make sure the repo is the user's OWN (not the template). If `origin` points at someone else's repo, create theirs and push:
-   `gh repo create <their-name> --private --source=. --remote=origin --push`
-   (or, from a template repo: `gh repo create <their-name> --template <owner/repo> --private --clone`).
+2. Make sure the repo is the user's OWN (not the template). If `origin` points at someone else's repo and the user is already inside a working copy, create theirs in place (this keeps their local edits):
+   `gh repo create <their-name> --public --source=. --remote=origin --push`
+   Use `--public` so the one-click Vercel deploy can clone it. (If they don't have a local copy yet, have them use GitHub "Use this template" in the browser — do NOT `--clone` into a new directory and strand their current copy.)
 3. Enable Actions to open PRs (off by default — the weekly optimizer needs it):
    `gh api -X PUT repos/{owner}/{repo}/actions/permissions/workflow -F default_workflow_permissions=write -F can_approve_pull_request_reviews=true`
-4. Set the optimizer's GitHub Actions secrets from values the user pastes:
-   - `gh secret set ANTHROPIC_API_KEY` (their Anthropic API key — this is the one with a per-run token cost)
-   - `gh secret set GA4_PROPERTY_ID` (NUMERIC property id)
-   - `gh secret set GA4_SERVICE_ACCOUNT_JSON < path/to/key.json` (the whole JSON blob)
-   Confirm with `gh secret list`. These power the weekly run; without them it degrades to "report only".
+4. Set the optimizer's GitHub Actions secrets from values the user pastes. Pipe each value so `gh` doesn't block on an interactive prompt:
+   - `printf %s '<their Anthropic key>' | gh secret set ANTHROPIC_API_KEY`
+   - `printf %s '<numeric property id>' | gh secret set GA4_PROPERTY_ID`
+   - `gh secret set GA4_SERVICE_ACCOUNT_JSON < path/to/key.json` (the whole JSON file)
+   Confirm with `gh secret list`. Without these the weekly run degrades to "report only".
 
 ### Connect Vercel
-The weekly job needs NO Vercel credential — merging a PR auto-deploys via Git. So "connect" = link the repo once. Easiest routes:
-- **Deploy button / dashboard import:** point them at the "Deploy to Vercel" button in `README.md` (one click: clones into their GitHub, creates the project, prompts for env vars, first deploy, and wires auto-deploy-on-push). Repo must be PUBLIC for the clone flow.
-- **Or via CLI** (if `vercel` is installed and they're logged in): `vercel link`, then set the runtime env vars and deploy:
-  - `vercel env add NEXT_PUBLIC_SITE_URL production` (their domain or the *.vercel.app URL)
+The weekly job needs NO Vercel credential — merging a PR auto-deploys via Git. So "connect" = link the user's OWN repo once.
+- **Preferred** (when the `vercel` CLI is available and the user is in their repo): `vercel link` (links *this* repo — works whether public or private), then set the runtime env vars and deploy:
+  - `vercel env add NEXT_PUBLIC_SITE_URL production` (their real `*.vercel.app` URL or custom domain — not a placeholder)
   - `vercel env add NEXT_PUBLIC_GA4_MEASUREMENT_ID production` (the `G-XXXX` id)
   - optionally `GA4_MEASUREMENT_PROTOCOL_SECRET`, `LEAD_WEBHOOK_URL`
   - `vercel --prod`
+- **No `vercel` CLI?** Have them import THEIR repo at vercel.com → **Add New → Project → Import** → pick their repo, and set the same env vars in the import form. (Don't send them to the one-click clone button here — that clones the template into a *separate* repo, not the one they're working in.)
 Confirm the repo is Git-connected so every push auto-deploys.
 
 > Note the split: front-end values (`NEXT_PUBLIC_*`, webhook) are **Vercel env vars**; the optimizer's secrets are **GitHub Actions secrets**. Put each in the right place.
@@ -80,8 +91,8 @@ Two pieces:
    - Save `GA4_PROPERTY_ID` (numeric) and `GA4_SERVICE_ACCOUNT_JSON` as **GitHub Actions secrets** (see Connect GitHub step 4).
 
 ### Deploy (go live)
-1. Verify GitHub + Vercel are connected and `NEXT_PUBLIC_SITE_URL` is set (a production build throws if it still resolves to `example.com`).
-2. Confirm with the user, then push to the deploy branch (usually `main`). Vercel auto-builds and deploys.
+1. Verify GitHub + Vercel are connected and `NEXT_PUBLIC_SITE_URL` is set to the real URL (a production build throws if it still resolves to `example.com`).
+2. Find Vercel's PRODUCTION branch (usually `main`) and the current branch (`git branch --show-current`). Vercel deploys production from the production branch only — do NOT push the current feature branch to production. If the user isn't on the production branch, get explicit sign-off, then merge into it (e.g. open + merge a PR into `main`) — that triggers the deploy.
 3. Report the live URL. Offer to open it.
 
 ### Weekly sign-off

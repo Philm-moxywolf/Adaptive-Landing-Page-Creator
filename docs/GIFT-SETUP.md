@@ -28,7 +28,7 @@ You drive the whole thing from a **console inside Claude Code**: connect your ac
    - **Deploy** → you're live.
 4. **Every Saturday**, the optimizer proposes edits. Open the console, review them, and click **Approve** (or **Skip**). Nothing goes live without you.
 
-That's it. Steps 1–3 are a one-time ~15–30 minutes (the Google Analytics service-account step is the only fiddly bit — Claude walks you through it). After that it's ~2 minutes a week.
+That's it. Steps 1–3 are a one-time ~30–45 minutes (the Google Analytics service-account step is the only fiddly bit — Claude walks you through it). After that it's ~2 minutes a week.
 
 ---
 

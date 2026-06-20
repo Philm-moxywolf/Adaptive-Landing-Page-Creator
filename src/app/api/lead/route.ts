@@ -101,9 +101,11 @@ export async function POST(req: Request) {
   const clean = sanitize(body);
 
   // 2. Forward only the sanitized fields to the client's webhook / CRM.
-  if (siteConfig.conversion.leadWebhookEnabled && process.env.LEAD_WEBHOOK_URL) {
+  const webhookConfigured =
+    siteConfig.conversion.leadWebhookEnabled && Boolean(process.env.LEAD_WEBHOOK_URL);
+  if (webhookConfigured) {
     try {
-      await fetch(process.env.LEAD_WEBHOOK_URL, {
+      const res = await fetch(process.env.LEAD_WEBHOOK_URL as string, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -112,9 +114,23 @@ export async function POST(req: Request) {
           received_at: new Date().toISOString(),
         }),
       });
+      if (!res.ok) throw new Error(`webhook responded ${res.status}`);
     } catch (err) {
+      // Don't show false success — surface the error to the form, and do NOT
+      // fire a conversion for a lead we couldn't actually deliver.
       console.error("Lead webhook failed:", err);
+      return NextResponse.json(
+        { ok: false, error: "We couldn't save your details just now. Please try again." },
+        { status: 502 },
+      );
     }
+  } else {
+    // No webhook configured — don't silently lose the lead. Record it in the
+    // server logs so it's recoverable, and nudge the operator to set the webhook.
+    console.warn(
+      "[lead] LEAD_WEBHOOK_URL not set — lead captured in logs only. Set it to deliver leads to your CRM/inbox.",
+      { email, form_id: clean.form_id ?? "lead" },
+    );
   }
 
   // 3. Server-side GA4 conversion (Measurement Protocol).
@@ -122,8 +138,11 @@ export async function POST(req: Request) {
   const clientId = parseGaClientId(req.headers.get("cookie"));
   if (GA4_ID && apiSecret && clientId) {
     try {
+      const mpUrl = new URL("https://www.google-analytics.com/mp/collect");
+      mpUrl.searchParams.set("measurement_id", GA4_ID);
+      mpUrl.searchParams.set("api_secret", apiSecret);
       await fetch(
-        `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_ID}&api_secret=${apiSecret}`,
+        mpUrl,
         {
           method: "POST",
           body: JSON.stringify({

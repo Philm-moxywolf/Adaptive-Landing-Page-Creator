@@ -24,7 +24,7 @@ It's built to convert cold traffic from *any* source — paid ads, SEO, AI searc
 
 ---
 
-> **First time? → [Go-live guide](docs/GO-LIVE.md)** — the complete click-by-click walkthrough, ~30 minutes, no coding required.
+> **First time? → [Go-live guide](docs/GO-LIVE.md)** — the complete click-by-click walkthrough, ~30–45 minutes, no coding required.
 
 ## Run it from Claude Code (the console)
 
