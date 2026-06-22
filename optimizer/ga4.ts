@@ -32,6 +32,8 @@ const TRACKED_EVENTS: string[] = [
   EVENTS.FORM_START,
   EVENTS.FORM_SUBMIT,
   EVENTS.GENERATE_LEAD,
+  EVENTS.AI_REFERRAL,
+  EVENTS.AI_CRAWLER,
 ];
 
 function num(value: string | null | undefined): number {
@@ -209,6 +211,8 @@ export async function fetchGa4Report(
     form_completion_rate: events["form_start"]
       ? ((events["form_submit"] ?? 0) / events["form_start"]) * 100
       : null,
+    // AIEO: share of sessions arriving from an AI answer engine.
+    ai_referral_share: sessions ? ((events["ai_referral"] ?? 0) / sessions) * 100 : null,
   };
 
   return {

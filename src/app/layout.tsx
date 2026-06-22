@@ -17,6 +17,7 @@ import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { ConsentBanner } from "@/components/analytics/ConsentBanner";
 import { WebVitalsReporter } from "@/components/tracking/WebVitalsReporter";
 import { ScrollDepthTracker } from "@/components/tracking/ScrollDepthTracker";
+import { AiSourceTracker } from "@/components/tracking/AiSourceTracker";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 
@@ -97,6 +98,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             thresholds={siteConfig.analytics.scrollDepthThresholds}
           />
         )}
+        {ANALYTICS_ENABLED && <AiSourceTracker />}
         {ANALYTICS_ENABLED && siteConfig.analytics.enableConsentBanner && (
           <ConsentBanner />
         )}

@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
 import { siteConfig } from "@config/site.config";
 import { pickVariant } from "@/lib/variants";
-import { VARIANT_COOKIE } from "@/lib/analytics";
+import { VARIANT_COOKIE, EVENTS } from "@/lib/analytics";
+import { matchAiCrawler } from "@/lib/ai-sources";
 
 /**
  * Edge middleware does two things on every page request:
@@ -32,7 +33,7 @@ function buildCsp(nonce: string): string {
   ].join("; ");
 }
 
-export function middleware(req: NextRequest) {
+export function middleware(req: NextRequest, event: NextFetchEvent) {
   const nonce = btoa(crypto.randomUUID());
   const isProd = process.env.NODE_ENV === "production";
   const csp = buildCsp(nonce);
@@ -74,6 +75,35 @@ export function middleware(req: NextRequest) {
       sameSite: "lax",
     });
   }
+
+  // Record AI-crawler fetches as a GA4 event (server-side, fire-and-forget via
+  // waitUntil — costs the request nothing). Bots don't run JS, so this server-side
+  // ping is the only way to count AI-engine crawl coverage for the optimizer.
+  const aiBot = matchAiCrawler(req.headers.get("user-agent"));
+  if (aiBot) {
+    const gaId =
+      siteConfig.analytics.ga4MeasurementId ||
+      process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID ||
+      "";
+    const apiSecret = process.env.GA4_MEASUREMENT_PROTOCOL_SECRET || "";
+    if (gaId && apiSecret) {
+      const mpUrl = new URL("https://www.google-analytics.com/mp/collect");
+      mpUrl.searchParams.set("measurement_id", gaId);
+      mpUrl.searchParams.set("api_secret", apiSecret);
+      event.waitUntil(
+        fetch(mpUrl, {
+          method: "POST",
+          body: JSON.stringify({
+            client_id: crypto.randomUUID(),
+            events: [
+              { name: EVENTS.AI_CRAWLER, params: { ai_bot: aiBot, engagement_time_msec: 1 } },
+            ],
+          }),
+        }).catch(() => {}),
+      );
+    }
+  }
+
   return res;
 }
 

@@ -23,6 +23,10 @@ export const EVENTS = {
   GENERATE_LEAD: "generate_lead",
   OUTBOUND_CLICK: "outbound_click",
   WEB_VITALS: "web_vitals",
+  /** Visit referred by an AI answer engine (ChatGPT, Perplexity, …) — client-detected. */
+  AI_REFERRAL: "ai_referral",
+  /** AI crawler fetched the page — fired server-side from middleware via Measurement Protocol. */
+  AI_CRAWLER: "ai_crawler",
 } as const;
 
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS];

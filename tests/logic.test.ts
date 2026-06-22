@@ -8,6 +8,7 @@ import type { TargetsConfig } from "../src/lib/types";
 import { pickVariant, hashUnitInterval } from "../src/lib/variants";
 import { hexToRgbTriplet } from "../src/lib/theme";
 import { cn, ctaClasses, slugify } from "../src/lib/cn";
+import { matchAiCrawler, classifyAiReferrer } from "../src/lib/ai-sources";
 
 // ── Content schema ──────────────────────────────────────────────────────────
 test("content schema validates the shipped landing.json", () => {
@@ -83,6 +84,22 @@ test("evaluateTargets scores SEO metrics (Search Console) from the combined map"
   const e = evaluateTargets(seoCfg, { organic_ctr: 4, avg_position: 6 });
   assert.equal(e.results.find((r) => r.target.key === "octr")!.achieved, true); // 4 ≥ 3.6
   assert.equal(e.results.find((r) => r.target.key === "pos")!.achieved, true); // 6 ≤ 8.33
+});
+
+// ── AIEO source detection ─────────────────────────────────────────────────────
+test("matchAiCrawler detects AI crawlers and ignores normal browsers", () => {
+  assert.equal(matchAiCrawler("Mozilla/5.0 (compatible; GPTBot/1.2)"), "GPTBot");
+  assert.equal(matchAiCrawler("PerplexityBot/1.0"), "PerplexityBot");
+  assert.equal(matchAiCrawler("Mozilla/5.0 (Macintosh) Chrome/120 Safari/537"), null);
+  assert.equal(matchAiCrawler(null), null);
+});
+
+test("classifyAiReferrer maps AI engines and ignores normal referrers", () => {
+  assert.equal(classifyAiReferrer("https://www.perplexity.ai/search?q=x"), "perplexity");
+  assert.equal(classifyAiReferrer("https://chatgpt.com/"), "chatgpt");
+  assert.equal(classifyAiReferrer("https://gemini.google.com/app"), "gemini");
+  assert.equal(classifyAiReferrer("https://www.google.com/"), null);
+  assert.equal(classifyAiReferrer(""), null);
 });
 
 // ── A/B variant assignment ───────────────────────────────────────────────────

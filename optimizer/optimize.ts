@@ -89,6 +89,7 @@ export async function optimizeContent(args: {
   report: Ga4Report | null;
   posthog: PosthogReport | null;
   gsc: GscReport | null;
+  citations: string | null;
   research: string;
 }): Promise<OptimizeResult> {
   const { system, user } = buildOptimizerPrompt(args);

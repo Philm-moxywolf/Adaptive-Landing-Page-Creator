@@ -8,6 +8,7 @@ import { fetchPosthogReport } from "./posthog";
 import { fetchGscReport } from "./gsc";
 import { evaluateTargets, formatAttainment } from "./targets";
 import { runResearch } from "./research";
+import { runCitationCheck } from "./aieo";
 import { optimizeContent } from "./optimize";
 import { hasApiKey, OPTIMIZER_MODEL } from "./anthropic";
 
@@ -103,13 +104,21 @@ async function main() {
 
   const content = loadContent();
 
-  // 3. Live research (best-effort)
+  // 3. Live research + AI-visibility check (both best-effort)
   console.log("Researching market…");
   let research = "";
   try {
     research = await runResearch(siteConfig);
   } catch (e) {
     console.warn(`  research failed (continuing): ${(e as Error).message}`);
+  }
+
+  console.log("Checking AI-answer visibility…");
+  let citations: string | null = null;
+  try {
+    citations = await runCitationCheck(siteConfig);
+  } catch (e) {
+    console.warn(`  AI-visibility check failed (continuing): ${(e as Error).message}`);
   }
 
   // 4. Rewrite
@@ -121,6 +130,7 @@ async function main() {
     report,
     posthog,
     gsc,
+    citations,
     research,
   });
 
@@ -170,6 +180,7 @@ async function main() {
     report,
     posthog,
     gsc,
+    citations,
     research,
   });
 

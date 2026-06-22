@@ -60,6 +60,7 @@ export const siteConfig: SiteConfig = {
     locale: "en_US",
     currency: "USD",
     googleSiteVerification: "", // paste the Search Console HTML-tag token to verify ownership
+    aiCrawlerPolicy: "allow", // "allow" | "search-only" | "block" — how robots.txt treats AI crawlers
   },
 
   analytics: {
