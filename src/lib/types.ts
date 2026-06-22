@@ -82,6 +82,8 @@ export interface SiteConfig {
     locale: string;
     /** ISO 4217 currency for Product/Offer structured data, e.g. "USD", "GBP". */
     currency: string;
+    /** Google Search Console verification token (Settings → Ownership → HTML tag). */
+    googleSiteVerification?: string;
   };
   analytics: {
     /** GA4 Measurement ID. Falls back to NEXT_PUBLIC_GA4_MEASUREMENT_ID. */
@@ -160,7 +162,9 @@ export interface ConversionTarget {
     | "avg_session_duration"
     | "cta_click_rate"
     | "scroll_75_rate"
-    | "form_completion_rate";
+    | "form_completion_rate"
+    | "organic_ctr"
+    | "avg_position";
   unit: TargetUnit;
   direction: TargetDirection;
   /** The goal value. "Achieved" = this value scaled by the stretch multiplier. */

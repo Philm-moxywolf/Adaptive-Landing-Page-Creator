@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import { safeParseContent, sectionSchema } from "../src/lib/content-schema";
 import { evaluateTargets } from "../optimizer/targets";
 import type { TargetsConfig } from "../src/lib/types";
-import type { Ga4Report } from "../optimizer/ga4";
 import { pickVariant, hashUnitInterval } from "../src/lib/variants";
 import { hexToRgbTriplet } from "../src/lib/theme";
 import { cn, ctaClasses, slugify } from "../src/lib/cn";
@@ -41,15 +40,8 @@ const targetsCfg: TargetsConfig = {
   ],
 };
 
-function mockReport(metrics: Record<string, number | null>): Ga4Report {
-  return {
-    windowDays: 7, startDate: "", endDate: "", sessions: 100, conversions: 6,
-    metrics, events: {}, channels: [], variants: [], notes: [],
-  };
-}
-
 test("evaluateTargets: higher-is-better stretch goal + attainment", () => {
-  const e = evaluateTargets(targetsCfg, mockReport({ conversion_rate: 6, bounce_rate: 20 }));
+  const e = evaluateTargets(targetsCfg, { conversion_rate: 6, bounce_rate: 20 });
   const cvr = e.results.find((r) => r.target.key === "cvr")!;
   assert.equal(cvr.goal, 4.8); // 4 × 1.2
   assert.equal(cvr.achieved, true); // 6 ≥ 4.8
@@ -57,7 +49,7 @@ test("evaluateTargets: higher-is-better stretch goal + attainment", () => {
 });
 
 test("evaluateTargets: lower-is-better guards divide-by-zero (no Infinity)", () => {
-  const e = evaluateTargets(targetsCfg, mockReport({ conversion_rate: 6, bounce_rate: 0 }));
+  const e = evaluateTargets(targetsCfg, { conversion_rate: 6, bounce_rate: 0 });
   const bounce = e.results.find((r) => r.target.key === "bounce")!;
   assert.equal(bounce.goal, 35 / 1.2);
   assert.equal(bounce.achieved, true); // 0 ≤ goal
@@ -66,17 +58,31 @@ test("evaluateTargets: lower-is-better guards divide-by-zero (no Infinity)", () 
 });
 
 test("evaluateTargets: coverage + no-data behaviour", () => {
-  const full = evaluateTargets(targetsCfg, mockReport({ conversion_rate: 6, bounce_rate: 20 }));
+  const full = evaluateTargets(targetsCfg, { conversion_rate: 6, bounce_rate: 20 });
   assert.equal(full.fullCoverage, true);
   assert.equal(full.allAchieved, true);
 
-  const partial = evaluateTargets(targetsCfg, mockReport({ conversion_rate: 6, bounce_rate: null }));
+  const partial = evaluateTargets(targetsCfg, { conversion_rate: 6, bounce_rate: null });
   assert.equal(partial.fullCoverage, false); // bounce unmeasured
 
   const none = evaluateTargets(targetsCfg, null);
   assert.equal(none.dataAvailable, false);
   assert.equal(none.allAchieved, false);
   assert.equal(none.fullCoverage, false);
+});
+
+test("evaluateTargets scores SEO metrics (Search Console) from the combined map", () => {
+  const seoCfg: TargetsConfig = {
+    stretchMultiplier: 1.2,
+    evaluationWindowDays: 7,
+    targets: [
+      { key: "octr", label: "CTR", metric: "organic_ctr", unit: "percent", direction: "higher_is_better", target: 3 },
+      { key: "pos", label: "Pos", metric: "avg_position", unit: "ratio", direction: "lower_is_better", target: 10 },
+    ],
+  };
+  const e = evaluateTargets(seoCfg, { organic_ctr: 4, avg_position: 6 });
+  assert.equal(e.results.find((r) => r.target.key === "octr")!.achieved, true); // 4 ≥ 3.6
+  assert.equal(e.results.find((r) => r.target.key === "pos")!.achieved, true); // 6 ≤ 8.33
 });
 
 // ── A/B variant assignment ───────────────────────────────────────────────────

@@ -5,6 +5,7 @@ import { targetsConfig } from "../config/targets.config";
 import { safeParseContent, type Content } from "../src/lib/content-schema";
 import { fetchGa4Report } from "./ga4";
 import { fetchPosthogReport } from "./posthog";
+import { fetchGscReport } from "./gsc";
 import { evaluateTargets, formatAttainment } from "./targets";
 import { runResearch } from "./research";
 import { optimizeContent } from "./optimize";
@@ -55,9 +56,19 @@ async function main() {
   const posthog = await fetchPosthogReport(targetsConfig.evaluationWindowDays).catch(
     () => null,
   );
+  const gsc = await fetchGscReport(targetsConfig.evaluationWindowDays).catch(
+    () => null,
+  );
 
-  // 2. Score against targets
-  const targetEval = evaluateTargets(targetsConfig, report);
+  // 2. Score against targets — combined metrics across all connected sources.
+  const metrics: Record<string, number | null> = {
+    ...(report?.metrics ?? {}),
+    ...(gsc?.metrics ?? {}),
+  };
+  const targetEval = evaluateTargets(
+    targetsConfig,
+    Object.keys(metrics).length ? metrics : null,
+  );
   console.log("Targets:");
   console.log(formatAttainment(targetEval));
   console.log(
@@ -109,6 +120,7 @@ async function main() {
     targetEval,
     report,
     posthog,
+    gsc,
     research,
   });
 
@@ -157,6 +169,7 @@ async function main() {
     targetEval,
     report,
     posthog,
+    gsc,
     research,
   });
 

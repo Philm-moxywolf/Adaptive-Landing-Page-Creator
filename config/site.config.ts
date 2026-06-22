@@ -59,6 +59,7 @@ export const siteConfig: SiteConfig = {
     twitterHandle: "",
     locale: "en_US",
     currency: "USD",
+    googleSiteVerification: "", // paste the Search Console HTML-tag token to verify ownership
   },
 
   analytics: {

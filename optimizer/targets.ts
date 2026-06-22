@@ -1,5 +1,4 @@
 import type { TargetsConfig, ConversionTarget } from "../src/lib/types";
-import type { Ga4Report } from "./ga4";
 
 /**
  * Scores each conversion target against the GA4 data and the "120% of target"
@@ -29,12 +28,13 @@ export interface TargetsEvaluation {
 
 export function evaluateTargets(
   config: TargetsConfig,
-  report: Ga4Report | null,
+  /** Combined metric map across all sources (GA4 + Search Console + AIEO). */
+  metrics: Record<string, number | null> | null,
 ): TargetsEvaluation {
   const m = config.stretchMultiplier;
 
   const results: TargetAttainment[] = config.targets.map((target) => {
-    const current = report?.metrics[target.metric] ?? null;
+    const current = metrics?.[target.metric] ?? null;
     const higher = target.direction === "higher_is_better";
     const goal = higher ? target.target * m : target.target / m;
 
@@ -65,7 +65,7 @@ export function evaluateTargets(
   const achievedCount = results.filter((r) => r.achieved).length;
 
   return {
-    dataAvailable: report !== null && withData.length > 0,
+    dataAvailable: metrics !== null && withData.length > 0,
     results,
     allAchieved: withData.length > 0 && withData.every((r) => r.achieved),
     achievedCount,

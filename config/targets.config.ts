@@ -64,6 +64,23 @@ export const targetsConfig: TargetsConfig = {
       direction: "lower_is_better",
       target: 35.0,
     },
+    // SEO (Google Search Console) — only scored when GSC is connected.
+    {
+      key: "organic_ctr",
+      label: "Organic search CTR (Search Console)",
+      metric: "organic_ctr",
+      unit: "percent",
+      direction: "higher_is_better",
+      target: 3.0,
+    },
+    {
+      key: "avg_position",
+      label: "Average search position (Search Console)",
+      metric: "avg_position",
+      unit: "ratio",
+      direction: "lower_is_better",
+      target: 10.0,
+    },
   ],
 };
 

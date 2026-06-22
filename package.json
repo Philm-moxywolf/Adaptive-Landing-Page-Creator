@@ -16,6 +16,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",
     "@google-analytics/data": "^6.1.0",
+    "google-auth-library": "^10.7.0",
     "next": "^15.3.9",
     "posthog-js": "^1.392.0",
     "react": "19.0.0",

@@ -5,6 +5,7 @@ import { buildOptimizerPrompt } from "./prompt";
 import type { TargetsEvaluation } from "./targets";
 import type { Ga4Report } from "./ga4";
 import type { PosthogReport } from "./posthog";
+import type { GscReport } from "./gsc";
 
 export interface OptimizeResult {
   content: Content;
@@ -87,6 +88,7 @@ export async function optimizeContent(args: {
   targetEval: TargetsEvaluation;
   report: Ga4Report | null;
   posthog: PosthogReport | null;
+  gsc: GscReport | null;
   research: string;
 }): Promise<OptimizeResult> {
   const { system, user } = buildOptimizerPrompt(args);
