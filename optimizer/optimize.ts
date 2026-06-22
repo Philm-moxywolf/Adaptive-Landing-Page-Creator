@@ -4,6 +4,7 @@ import { completeText } from "./anthropic";
 import { buildOptimizerPrompt } from "./prompt";
 import type { TargetsEvaluation } from "./targets";
 import type { Ga4Report } from "./ga4";
+import type { PosthogReport } from "./posthog";
 
 export interface OptimizeResult {
   content: Content;
@@ -85,6 +86,7 @@ export async function optimizeContent(args: {
   content: Content;
   targetEval: TargetsEvaluation;
   report: Ga4Report | null;
+  posthog: PosthogReport | null;
   research: string;
 }): Promise<OptimizeResult> {
   const { system, user } = buildOptimizerPrompt(args);

@@ -4,6 +4,7 @@ import { siteConfig } from "../config/site.config";
 import { targetsConfig } from "../config/targets.config";
 import { safeParseContent, type Content } from "../src/lib/content-schema";
 import { fetchGa4Report } from "./ga4";
+import { fetchPosthogReport } from "./posthog";
 import { evaluateTargets, formatAttainment } from "./targets";
 import { runResearch } from "./research";
 import { optimizeContent } from "./optimize";
@@ -51,6 +52,9 @@ async function main() {
 
   // 1. Data
   const report = await fetchGa4Report(targetsConfig.evaluationWindowDays);
+  const posthog = await fetchPosthogReport(targetsConfig.evaluationWindowDays).catch(
+    () => null,
+  );
 
   // 2. Score against targets
   const targetEval = evaluateTargets(targetsConfig, report);
@@ -104,6 +108,7 @@ async function main() {
     content,
     targetEval,
     report,
+    posthog,
     research,
   });
 
@@ -151,6 +156,7 @@ async function main() {
     changelog: result.changelog,
     targetEval,
     report,
+    posthog,
     research,
   });
 

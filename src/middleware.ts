@@ -23,6 +23,7 @@ function buildCsp(nonce: string): string {
     `img-src 'self' data: blob: https:`,
     `font-src 'self' https://fonts.gstatic.com`,
     `connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com`,
+    `worker-src 'self' blob:`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
     `form-action 'self'`,
@@ -77,6 +78,7 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Run on page documents only — skip static assets, API routes, and files.
-  matcher: ["/((?!_next/static|_next/image|api|favicon.ico|.*\\..*).*)"],
+  // Run on page documents only — skip static assets, API routes, the PostHog
+  // proxy (/r7x), and files.
+  matcher: ["/((?!_next/static|_next/image|api|r7x|favicon.ico|.*\\..*).*)"],
 };

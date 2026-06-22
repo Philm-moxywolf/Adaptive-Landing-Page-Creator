@@ -63,16 +63,24 @@ export function track(
     // gtag not ready yet — queue in gtag's own format so it replays on load.
     dataLayerPush("event", name, payload);
   }
+  // Mirror the same event + variant into PostHog (when enabled), so the optimizer
+  // can read one consistent taxonomy across both sources.
+  window.posthog?.capture(name, payload);
 }
 
 /** Update Consent Mode v2 grants (called by the consent banner). */
 export function setConsent(granted: boolean): void {
-  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+  if (typeof window === "undefined") return;
   const state = granted ? "granted" : "denied";
-  window.gtag("consent", "update", {
-    ad_storage: state,
-    ad_user_data: state,
-    ad_personalization: state,
-    analytics_storage: state,
-  });
+  if (typeof window.gtag === "function") {
+    window.gtag("consent", "update", {
+      ad_storage: state,
+      ad_user_data: state,
+      ad_personalization: state,
+      analytics_storage: state,
+    });
+  }
+  // PostHog honors the same consent choice.
+  if (granted) window.posthog?.opt_in_capturing();
+  else window.posthog?.opt_out_capturing();
 }

@@ -2,9 +2,18 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies, headers } from "next/headers";
 import "./globals.css";
-import { siteConfig, GA4_ID, ANALYTICS_ENABLED, SITE_URL } from "@/lib/config";
+import {
+  siteConfig,
+  GA4_ID,
+  ANALYTICS_ENABLED,
+  SITE_URL,
+  POSTHOG_ENABLED,
+  POSTHOG_KEY,
+  POSTHOG_UI_HOST,
+} from "@/lib/config";
 import { buildThemeCss } from "@/lib/theme";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { ConsentBanner } from "@/components/analytics/ConsentBanner";
 import { WebVitalsReporter } from "@/components/tracking/WebVitalsReporter";
 import { ScrollDepthTracker } from "@/components/tracking/ScrollDepthTracker";
@@ -62,6 +71,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             gaId={GA4_ID}
             initialConsent={initialConsent}
             nonce={nonce}
+          />
+        )}
+
+        {POSTHOG_ENABLED && (
+          <PostHogProvider
+            apiKey={POSTHOG_KEY}
+            uiHost={POSTHOG_UI_HOST}
+            requireConsent={siteConfig.analytics.enableConsentBanner}
+            initialConsent={initialConsent}
           />
         )}
 
