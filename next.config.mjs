@@ -27,6 +27,19 @@ const nextConfig = {
   images: {
     remotePatterns: imageHosts.map((hostname) => ({ protocol: "https", hostname })),
   },
+  // PostHog reverse proxy: all analytics traffic flows through this first-party
+  // path, so it dodges ad-blockers AND the strict CSP needs no posthog.com hosts
+  // ('self' already covers it). Order matters: static/array before the catch-all.
+  // The /r7x prefix is intentionally non-obvious (paths like /analytics get blocked).
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    const region = (process.env.NEXT_PUBLIC_POSTHOG_HOST || "").includes("eu") ? "eu" : "us";
+    return [
+      { source: "/r7x/static/:path*", destination: `https://${region}-assets.i.posthog.com/static/:path*` },
+      { source: "/r7x/array/:path*", destination: `https://${region}-assets.i.posthog.com/array/:path*` },
+      { source: "/r7x/:path*", destination: `https://${region}.i.posthog.com/:path*` },
+    ];
+  },
   async headers() {
     return [
       {

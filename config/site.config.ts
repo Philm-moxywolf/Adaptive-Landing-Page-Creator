@@ -59,11 +59,16 @@ export const siteConfig: SiteConfig = {
     twitterHandle: "",
     locale: "en_US",
     currency: "USD",
+    googleSiteVerification: "", // paste the Search Console HTML-tag token to verify ownership
+    aiCrawlerPolicy: "allow", // "allow" | "search-only" | "block" — how robots.txt treats AI crawlers
   },
 
   analytics: {
     // Leave blank to use the NEXT_PUBLIC_GA4_MEASUREMENT_ID env var instead.
     ga4MeasurementId: "",
+    // Keep true if you have EU/UK visitors: GA + PostHog start opted-OUT until the
+    // visitor accepts. Setting this false fires analytics with no consent prompt —
+    // only do that if you have no consent obligation in your market.
     enableConsentBanner: true,
     scrollDepthThresholds: [25, 50, 75, 90],
     reportWebVitals: true,

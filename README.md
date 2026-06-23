@@ -42,7 +42,9 @@ One click clones this into your GitHub, creates the Vercel project, prompts for 
 runtime env vars, and ships the first deploy — then every push auto-deploys.
 *(The repo must be public for the clone flow. The weekly optimizer's secrets —
 `ANTHROPIC_API_KEY`, `GA4_PROPERTY_ID`, `GA4_SERVICE_ACCOUNT_JSON` — are GitHub
-Actions secrets, set separately; the console does this for you.)*
+Actions secrets, set separately; the console does this for you. Optional extra
+signals — PostHog and Google Search Console — connect the same way; see
+[SETUP.md §5d](docs/SETUP.md).)*
 
 ## The two files you edit
 

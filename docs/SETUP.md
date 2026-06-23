@@ -78,8 +78,9 @@ So conversions count even when the browser tag is blocked:
 3. **Environment Variables** — add the public ones at minimum:
    - `NEXT_PUBLIC_GA4_MEASUREMENT_ID`
    - `NEXT_PUBLIC_SITE_URL`
-   - `GA4_MEASUREMENT_PROTOCOL_SECRET` (if using server-side conversions)
+   - `GA4_MEASUREMENT_PROTOCOL_SECRET` (if using server-side conversions / AI-crawler tracking)
    - `LEAD_WEBHOOK_URL` (if forwarding leads to a CRM/Zapier/Make)
+   - `NEXT_PUBLIC_POSTHOG_KEY` + `NEXT_PUBLIC_POSTHOG_HOST` (optional — PostHog, see §5d)
 4. **Deploy.** Then **Settings → Domains** → add your domain and follow the DNS steps.
 
 Vercel will now auto-deploy every push to `main`, and build a **preview** for every
@@ -119,6 +120,38 @@ GitHub → **Actions → Weekly conversion optimizer → Run workflow** → tick
 Watch the logs and download the **optimizer-report** artifact. When you're happy,
 run it without dry-run (or just wait for Saturday) and it'll open a PR.
 
+### 5d. Optional: richer signals (PostHog · Search Console · AIEO)
+
+All three are **free and optional** — the optimizer works on GA4 alone and auto-detects
+each source (connected → used; absent → skipped). Add any to give it more to learn from.
+
+**PostHog** (product analytics + session replay):
+1. Create a free project at https://posthog.com → copy the **Project API key** (`phc_…`,
+   public-safe) and your region host (`https://us.posthog.com` or `https://eu.posthog.com`).
+2. Add to **Vercel → Environment Variables**: `NEXT_PUBLIC_POSTHOG_KEY=phc_…` and
+   `NEXT_PUBLIC_POSTHOG_HOST=https://us.posthog.com`. (Ingestion is proxied through your
+   own domain at `/r7x`, so it survives ad-blockers and your strict CSP.)
+3. To let the **weekly optimizer** read PostHog, create a **Personal API key** (PostHog →
+   Settings → Personal API keys, scope **Query Read**) and add GitHub **secret**
+   `POSTHOG_PERSONAL_API_KEY`, plus GitHub **variables** `POSTHOG_PROJECT_ID` (Settings →
+   Project) and `POSTHOG_HOST` = the **app** host `https://us.posthog.com` (note: **no**
+   `.i.` — that's the ingestion host, which is different).
+
+**Google Search Console** (free SEO signal — reuses the GA4 service account from §5a):
+1. Verify your site at https://search.google.com/search-console.
+2. **Settings → Users and permissions** → add the **same** service-account email from §5a.
+3. Add GitHub **variable** `GSC_SITE_URL` — either `sc-domain:your-domain.com` (domain
+   property) or `https://your-domain.com/` (URL-prefix property).
+   → adds the `organic_ctr` + `avg_position` targets.
+
+**AIEO** (AI-engine visibility) works **automatically** — no new accounts:
+- `/llms.txt` (an AI-readable brief) and the AI-crawler `robots.txt` policy are live out of
+  the box; control crawlers via `seo.aiCrawlerPolicy` in `config/site.config.ts`
+  (`allow` | `search-only` | `block`).
+- AI-referral visits (`ai_referral`) and AI-crawler hits (`ai_crawler`, via the GA4
+  Measurement Protocol secret from §3) feed the `ai_referral_share` target and a weekly
+  AI-citation check in the optimizer.
+
 ---
 
 ## 6. Hand-off checklist (per client)
@@ -129,6 +162,7 @@ run it without dry-run (or just wait for Saturday) and it'll open a PR.
 - [ ] GA4 property + Measurement ID + key event + custom dimensions
 - [ ] Vercel project + env vars + custom domain
 - [ ] GitHub secrets for the optimizer
+- [ ] *(Optional)* PostHog and/or Search Console connected (§5d)
 - [ ] Dry-run the optimizer once and review the report
 
 Done — the page is live, fully tracked, and improving itself every week.

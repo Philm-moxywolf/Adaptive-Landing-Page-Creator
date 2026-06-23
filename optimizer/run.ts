@@ -4,8 +4,11 @@ import { siteConfig } from "../config/site.config";
 import { targetsConfig } from "../config/targets.config";
 import { safeParseContent, type Content } from "../src/lib/content-schema";
 import { fetchGa4Report } from "./ga4";
+import { fetchPosthogReport } from "./posthog";
+import { fetchGscReport } from "./gsc";
 import { evaluateTargets, formatAttainment } from "./targets";
 import { runResearch } from "./research";
+import { runCitationCheck } from "./aieo";
 import { optimizeContent } from "./optimize";
 import { hasApiKey, OPTIMIZER_MODEL } from "./anthropic";
 
@@ -51,9 +54,22 @@ async function main() {
 
   // 1. Data
   const report = await fetchGa4Report(targetsConfig.evaluationWindowDays);
+  const posthog = await fetchPosthogReport(targetsConfig.evaluationWindowDays).catch(
+    () => null,
+  );
+  const gsc = await fetchGscReport(targetsConfig.evaluationWindowDays).catch(
+    () => null,
+  );
 
-  // 2. Score against targets
-  const targetEval = evaluateTargets(targetsConfig, report);
+  // 2. Score against targets — combined metrics across all connected sources.
+  const metrics: Record<string, number | null> = {
+    ...(report?.metrics ?? {}),
+    ...(gsc?.metrics ?? {}),
+  };
+  const targetEval = evaluateTargets(
+    targetsConfig,
+    Object.keys(metrics).length ? metrics : null,
+  );
   console.log("Targets:");
   console.log(formatAttainment(targetEval));
   console.log(
@@ -88,13 +104,21 @@ async function main() {
 
   const content = loadContent();
 
-  // 3. Live research (best-effort)
+  // 3. Live research + AI-visibility check (both best-effort)
   console.log("Researching market…");
   let research = "";
   try {
     research = await runResearch(siteConfig);
   } catch (e) {
     console.warn(`  research failed (continuing): ${(e as Error).message}`);
+  }
+
+  console.log("Checking AI-answer visibility…");
+  let citations: string | null = null;
+  try {
+    citations = await runCitationCheck(siteConfig);
+  } catch (e) {
+    console.warn(`  AI-visibility check failed (continuing): ${(e as Error).message}`);
   }
 
   // 4. Rewrite
@@ -104,6 +128,9 @@ async function main() {
     content,
     targetEval,
     report,
+    posthog,
+    gsc,
+    citations,
     research,
   });
 
@@ -151,6 +178,9 @@ async function main() {
     changelog: result.changelog,
     targetEval,
     report,
+    posthog,
+    gsc,
+    citations,
     research,
   });
 
