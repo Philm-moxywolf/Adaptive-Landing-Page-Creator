@@ -30,17 +30,26 @@ to keep climbing, not to stop at a fixed number.
 | `form_completion` | Form start → submit | 60.0% |
 | `engagement_rate` | GA4 engagement rate | 65.0% |
 | `bounce_rate` | Bounce rate (lower is better) | 35.0% |
+| `organic_ctr` | Organic search CTR — *needs Search Console* | 3.0% |
+| `avg_position` | Avg search position, lower is better — *needs Search Console* | 10.0 |
+| `ai_referral_share` | Share of sessions from AI engines — *needs AI tracking* | 3.0% |
 
 Set these from the client's real baseline + ambition. The defaults are illustrative.
+The last three are only scored when their source is connected; a target whose source
+isn't wired is treated as **n/a** (it never blocks the "all targets met" check).
 
 ---
 
 ## The Saturday pipeline
 
 ```
-1. GA4 pull        last 7 days: sessions, conversions, engagement, bounce,
-                   per-event counts, per-channel + per-variant breakdown
-2. Score targets   compute attainment vs the 120% stretch goal for each metric
+1. Data pull       GA4 (last 7 days): sessions, conversions, engagement, bounce,
+                   per-event counts, per-channel + per-variant breakdown.
+                   Plus, when connected: PostHog behaviour (funnel/drop-off),
+                   Search Console (queries, CTR, position), and an AI-engine
+                   visibility check (crawler coverage + AI-citation web search)
+2. Score targets   compute attainment vs the 120% stretch goal for each measured
+                   metric (targets whose source isn't connected are skipped as n/a)
 3. Research        Claude web-searches current competitor messaging, buyer
                    language, objections, and proof formats for your ICP/offer
 4. Rewrite         Claude (Opus 4.8) rewrites content/landing.json — copy,

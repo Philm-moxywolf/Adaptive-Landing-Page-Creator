@@ -79,6 +79,9 @@ export function middleware(req: NextRequest, event: NextFetchEvent) {
   // Record AI-crawler fetches as a GA4 event (server-side, fire-and-forget via
   // waitUntil — costs the request nothing). Bots don't run JS, so this server-side
   // ping is the only way to count AI-engine crawl coverage for the optimizer.
+  // NOTE: detection trusts the User-Agent (like robots.txt / server logs), so the
+  // ai_crawler count is an advisory signal — a spoofed UA could inflate it. The
+  // optimizer treats it as context, never as a hard conversion target.
   const aiBot = matchAiCrawler(req.headers.get("user-agent"));
   if (aiBot) {
     const gaId =

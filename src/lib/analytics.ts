@@ -85,6 +85,12 @@ export function setConsent(granted: boolean): void {
     });
   }
   // PostHog honors the same consent choice.
-  if (granted) window.posthog?.opt_in_capturing();
-  else window.posthog?.opt_out_capturing();
+  if (granted) {
+    window.posthog?.opt_in_capturing();
+    // The initial $pageview was dropped while opted-out; on a single-page landing
+    // site that's the only one, so re-fire it now that the visitor has consented.
+    window.posthog?.capture("$pageview");
+  } else {
+    window.posthog?.opt_out_capturing();
+  }
 }

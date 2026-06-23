@@ -66,6 +66,9 @@ export const siteConfig: SiteConfig = {
   analytics: {
     // Leave blank to use the NEXT_PUBLIC_GA4_MEASUREMENT_ID env var instead.
     ga4MeasurementId: "",
+    // Keep true if you have EU/UK visitors: GA + PostHog start opted-OUT until the
+    // visitor accepts. Setting this false fires analytics with no consent prompt —
+    // only do that if you have no consent obligation in your market.
     enableConsentBanner: true,
     scrollDepthThresholds: [25, 50, 75, 90],
     reportWebVitals: true,

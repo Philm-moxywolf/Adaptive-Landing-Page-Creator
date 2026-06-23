@@ -35,7 +35,7 @@ export const GA4_ID =
 /** Analytics only loads when a GA4 id is present — keeps local dev clean. */
 export const ANALYTICS_ENABLED = GA4_ID.length > 0;
 
-/** PostHog (client) project key — each recipient uses their own. Public-safe (ph_…). */
+/** PostHog (client) project key — each recipient uses their own. Public-safe (phc_…). */
 export const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY || "";
 /** PostHog UI host (for links in the SDK); ingestion is proxied via /r7x. */
 export const POSTHOG_UI_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.posthog.com";

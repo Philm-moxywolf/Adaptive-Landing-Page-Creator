@@ -86,6 +86,24 @@ test("evaluateTargets scores SEO metrics (Search Console) from the combined map"
   assert.equal(e.results.find((r) => r.target.key === "pos")!.achieved, true); // 6 ≤ 8.33
 });
 
+test("evaluateTargets: a not-connected source is n/a and does not block coverage", () => {
+  const cfg: TargetsConfig = {
+    stretchMultiplier: 1.2,
+    evaluationWindowDays: 7,
+    targets: [
+      { key: "cvr", label: "CVR", metric: "conversion_rate", unit: "percent", direction: "higher_is_better", target: 4 },
+      // Search Console target — its key is absent entirely when GSC isn't connected.
+      { key: "octr", label: "CTR", metric: "organic_ctr", unit: "percent", direction: "higher_is_better", target: 3 },
+    ],
+  };
+  // GA4-only run: conversion_rate present + beaten; organic_ctr key not in the map.
+  const e = evaluateTargets(cfg, { conversion_rate: 6 });
+  assert.equal(e.results.find((r) => r.target.key === "octr")!.applicable, false);
+  assert.equal(e.results.find((r) => r.target.key === "cvr")!.applicable, true);
+  assert.equal(e.fullCoverage, true); // coverage is over applicable targets only
+  assert.equal(e.allAchieved, true); // the one connected target is beaten
+});
+
 // ── AIEO source detection ─────────────────────────────────────────────────────
 test("matchAiCrawler detects AI crawlers and ignores normal browsers", () => {
   assert.equal(matchAiCrawler("Mozilla/5.0 (compatible; GPTBot/1.2)"), "GPTBot");
@@ -98,7 +116,9 @@ test("classifyAiReferrer maps AI engines and ignores normal referrers", () => {
   assert.equal(classifyAiReferrer("https://www.perplexity.ai/search?q=x"), "perplexity");
   assert.equal(classifyAiReferrer("https://chatgpt.com/"), "chatgpt");
   assert.equal(classifyAiReferrer("https://gemini.google.com/app"), "gemini");
+  assert.equal(classifyAiReferrer("https://www.bing.com/chat"), "copilot"); // path-based still works
   assert.equal(classifyAiReferrer("https://www.google.com/"), null);
+  assert.equal(classifyAiReferrer("https://evil.com/?x=chatgpt.com"), null); // query-string spoof rejected
   assert.equal(classifyAiReferrer(""), null);
 });
 

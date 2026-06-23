@@ -45,7 +45,16 @@ const AI_REFERRER =
 /** Classifies a referrer URL into an AI source label (e.g. "chatgpt"), or null. */
 export function classifyAiReferrer(referrer: string | null | undefined): string | null {
   if (!referrer) return null;
-  const m = referrer.match(AI_REFERRER);
+  // Match host + path only (never the query string), so a referrer like
+  // "https://evil.com/?x=chatgpt.com" can't be misclassified as an AI source.
+  let haystack = referrer;
+  try {
+    const u = new URL(referrer);
+    haystack = u.host + u.pathname;
+  } catch {
+    // Not a parseable URL — fall back to the raw string.
+  }
+  const m = haystack.match(AI_REFERRER);
   if (!m) return null;
   const host = m[0].toLowerCase();
   if (host.includes("chatgpt") || host.includes("openai")) return "chatgpt";

@@ -111,6 +111,12 @@ The weekly AI runs on GitHub and needs three secrets. Add them in your repositor
 
 ✅ Every **Saturday**, the optimizer now reads your analytics, rewrites the page, and opens a pull request for you to approve.
 
+> **Optional — deeper signals.** The page already tracks AI-engine traffic and ships an
+> AI-readable `/llms.txt` automatically. If you want the optimizer to learn from even more,
+> you can connect **PostHog** (session replay + product analytics) and **Google Search
+> Console** (free SEO data) — both are optional and the weekly AI runs fine without them.
+> See [SETUP.md §5d](SETUP.md) for the 5-minute steps.
+
 ---
 
 ## Step 4 · Make it yours

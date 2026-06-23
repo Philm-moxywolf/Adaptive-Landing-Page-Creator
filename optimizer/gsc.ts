@@ -70,7 +70,9 @@ export async function fetchGscReport(windowDays: number): Promise<GscReport | nu
   const end = new Date();
   end.setUTCDate(end.getUTCDate() - 3);
   const start = new Date(end);
-  start.setUTCDate(start.getUTCDate() - windowDays);
+  // GSC date ranges are inclusive on both ends, so subtract windowDays-1 to span
+  // exactly `windowDays` days (matching the GA4 window the targets assume).
+  start.setUTCDate(start.getUTCDate() - windowDays + 1);
   const startDate = ymd(start);
   const endDate = ymd(end);
 
@@ -96,7 +98,9 @@ export async function fetchGscReport(windowDays: number): Promise<GscReport | nu
       return (await res.json()) as GscApiResponse;
     };
 
-    const totalsResp = await query({ startDate, endDate });
+    // aggregationType "byProperty" keeps totals deterministic across property types
+    // (URL-prefix properties otherwise default to per-page aggregation).
+    const totalsResp = await query({ startDate, endDate, aggregationType: "byProperty" });
     const t = totalsResp.rows?.[0];
     const totals = {
       clicks: Number(t?.clicks ?? 0),
@@ -105,7 +109,13 @@ export async function fetchGscReport(windowDays: number): Promise<GscReport | nu
       position: Number(t?.position ?? 0),
     };
 
-    const queriesResp = await query({ startDate, endDate, dimensions: ["query"], rowLimit: 50 });
+    const queriesResp = await query({
+      startDate,
+      endDate,
+      dimensions: ["query"],
+      rowLimit: 50,
+      aggregationType: "byProperty",
+    });
     const rows: GscRow[] = (queriesResp.rows ?? []).map((r) => ({
       query: String(r.keys?.[0] ?? ""),
       clicks: Number(r.clicks ?? 0),

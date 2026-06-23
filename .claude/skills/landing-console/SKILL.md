@@ -90,6 +90,13 @@ Two pieces:
    - In GA4 → Admin → Property Access Management: add the service-account email (`...@...iam.gserviceaccount.com`) as **Viewer**.
    - Save `GA4_PROPERTY_ID` (numeric) and `GA4_SERVICE_ACCOUNT_JSON` as **GitHub Actions secrets** (see Connect GitHub step 4).
 
+### Connect optional signals (PostHog · Search Console) — only if the user asks
+All optional; the page + weekly optimizer work on GA4 alone, and each source auto-detects (connected → used, absent → skipped). Offer these as a "want even richer data?" follow-up, never as a blocker to going live.
+- **PostHog** (session replay + product analytics): free project at posthog.com → save the **Project API key** (`phc_…`, public) as Vercel env `NEXT_PUBLIC_POSTHOG_KEY` and the region as `NEXT_PUBLIC_POSTHOG_HOST` (`https://us.posthog.com` or `…eu…`). To let the optimizer read it, set GitHub **secret** `POSTHOG_PERSONAL_API_KEY` (a Personal API key, scope Query Read) + GitHub **variables** `POSTHOG_PROJECT_ID` and `POSTHOG_HOST` (the **app** host — note **no** `.i.`). Use `gh variable set` for the non-secret ones.
+- **Google Search Console** (free SEO signal): reuses the SAME GA4 service account — just add that service-account email to the GSC property (Settings → Users and permissions), then set GitHub **variable** `GSC_SITE_URL` (`sc-domain:domain.com` or `https://domain.com/`).
+- **AIEO** needs nothing extra: `/llms.txt`, the AI-crawler robots policy (`seo.aiCrawlerPolicy`), and AI-referral/crawler events are already live (crawler events reuse `GA4_MEASUREMENT_PROTOCOL_SECRET`).
+- Same split as always: `NEXT_PUBLIC_*` + the PostHog public key are **Vercel env vars**; the PostHog personal key is a **GitHub secret**; project id / host / GSC URL are **GitHub variables**.
+
 ### Deploy (go live)
 1. Verify GitHub + Vercel are connected and `NEXT_PUBLIC_SITE_URL` is set to the real URL (a production build throws if it still resolves to `example.com`).
 2. Find Vercel's PRODUCTION branch (usually `main`) and the current branch (`git branch --show-current`). Vercel deploys production from the production branch only — do NOT push the current feature branch to production. If the user isn't on the production branch, get explicit sign-off, then merge into it (e.g. open + merge a PR into `main`) — that triggers the deploy.

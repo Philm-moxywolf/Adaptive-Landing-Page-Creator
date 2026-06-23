@@ -43,6 +43,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   const hasFonts = (siteConfig.brand.fonts.stylesheets?.length ?? 0) > 0;
 
+  // Shared trackers + consent route through track() into BOTH GA and PostHog, so
+  // they're active whenever EITHER source is on (a PostHog-only recipient still
+  // gets the funnel + ai_referral events the optimizer reads).
+  const trackingEnabled = ANALYTICS_ENABLED || POSTHOG_ENABLED;
+
   return (
     <html lang={lang}>
       <head>
@@ -90,16 +95,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         </main>
         <SiteFooter />
 
-        {ANALYTICS_ENABLED && siteConfig.analytics.reportWebVitals && (
+        {trackingEnabled && siteConfig.analytics.reportWebVitals && (
           <WebVitalsReporter />
         )}
-        {ANALYTICS_ENABLED && (
+        {trackingEnabled && (
           <ScrollDepthTracker
             thresholds={siteConfig.analytics.scrollDepthThresholds}
           />
         )}
-        {ANALYTICS_ENABLED && <AiSourceTracker />}
-        {ANALYTICS_ENABLED && siteConfig.analytics.enableConsentBanner && (
+        {trackingEnabled && <AiSourceTracker />}
+        {trackingEnabled && siteConfig.analytics.enableConsentBanner && (
           <ConsentBanner />
         )}
       </body>
