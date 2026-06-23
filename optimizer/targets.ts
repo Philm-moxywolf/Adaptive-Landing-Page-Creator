@@ -1,5 +1,4 @@
 import type { TargetsConfig, ConversionTarget } from "../src/lib/types";
-import type { Ga4Report } from "./ga4";
 
 /**
  * Scores each conversion target against the GA4 data and the "120% of target"
@@ -15,6 +14,13 @@ export interface TargetAttainment {
   /** 100 = exactly at goal, ≥100 = goal beaten. null when no data. */
   attainmentPct: number | null;
   achieved: boolean;
+  /**
+   * Whether this target's source is connected this run (its metric key is present
+   * in the metrics map). An absent source (e.g. Search Console not set up) is "n/a"
+   * — it must NOT count against coverage, or the "all targets beaten → skip" path
+   * could never be reached. Present-but-null (connected, no data) IS applicable.
+   */
+  applicable: boolean;
   note?: string;
 }
 
@@ -23,18 +29,22 @@ export interface TargetsEvaluation {
   results: TargetAttainment[];
   allAchieved: boolean;
   achievedCount: number;
-  /** True only when EVERY configured target has data. */
+  /** True only when every APPLICABLE (connected-source) target has data. */
   fullCoverage: boolean;
 }
 
 export function evaluateTargets(
   config: TargetsConfig,
-  report: Ga4Report | null,
+  /** Combined metric map across all sources (GA4 + Search Console + AIEO). */
+  metrics: Record<string, number | null> | null,
 ): TargetsEvaluation {
   const m = config.stretchMultiplier;
 
   const results: TargetAttainment[] = config.targets.map((target) => {
-    const current = report?.metrics[target.metric] ?? null;
+    // Key PRESENT (even with a null value) = source connected this run → applicable.
+    // Key ABSENT entirely = source not connected (e.g. no Search Console) → n/a.
+    const applicable = metrics != null && target.metric in metrics;
+    const current = applicable && metrics ? metrics[target.metric] ?? null : null;
     const higher = target.direction === "higher_is_better";
     const goal = higher ? target.target * m : target.target / m;
 
@@ -45,7 +55,10 @@ export function evaluateTargets(
         goal,
         attainmentPct: null,
         achieved: false,
-        note: "No data for this metric yet.",
+        applicable,
+        note: applicable
+          ? "No data for this metric yet."
+          : "Source not connected this run.",
       };
     }
 
@@ -58,18 +71,22 @@ export function evaluateTargets(
     }
     const achieved = higher ? current >= goal : current <= goal;
 
-    return { target, current, goal, attainmentPct, achieved };
+    return { target, current, goal, attainmentPct, achieved, applicable: true };
   });
 
+  const applicableResults = results.filter((r) => r.applicable);
   const withData = results.filter((r) => r.current !== null);
   const achievedCount = results.filter((r) => r.achieved).length;
 
   return {
-    dataAvailable: report !== null && withData.length > 0,
+    dataAvailable: metrics !== null && withData.length > 0,
     results,
     allAchieved: withData.length > 0 && withData.every((r) => r.achieved),
     achievedCount,
-    fullCoverage: withData.length === results.length,
+    // Coverage is over APPLICABLE targets only — a target whose source isn't
+    // connected is n/a, so connecting only GA4 no longer blocks the skip path.
+    fullCoverage:
+      applicableResults.length > 0 && withData.length === applicableResults.length,
   };
 }
 

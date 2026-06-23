@@ -2,12 +2,22 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies, headers } from "next/headers";
 import "./globals.css";
-import { siteConfig, GA4_ID, ANALYTICS_ENABLED, SITE_URL } from "@/lib/config";
+import {
+  siteConfig,
+  GA4_ID,
+  ANALYTICS_ENABLED,
+  SITE_URL,
+  POSTHOG_ENABLED,
+  POSTHOG_KEY,
+  POSTHOG_UI_HOST,
+} from "@/lib/config";
 import { buildThemeCss } from "@/lib/theme";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { ConsentBanner } from "@/components/analytics/ConsentBanner";
 import { WebVitalsReporter } from "@/components/tracking/WebVitalsReporter";
 import { ScrollDepthTracker } from "@/components/tracking/ScrollDepthTracker";
+import { AiSourceTracker } from "@/components/tracking/AiSourceTracker";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 
@@ -32,6 +42,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   }
 
   const hasFonts = (siteConfig.brand.fonts.stylesheets?.length ?? 0) > 0;
+
+  // Shared trackers + consent route through track() into BOTH GA and PostHog, so
+  // they're active whenever EITHER source is on (a PostHog-only recipient still
+  // gets the funnel + ai_referral events the optimizer reads).
+  const trackingEnabled = ANALYTICS_ENABLED || POSTHOG_ENABLED;
 
   return (
     <html lang={lang}>
@@ -65,21 +80,31 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           />
         )}
 
+        {POSTHOG_ENABLED && (
+          <PostHogProvider
+            apiKey={POSTHOG_KEY}
+            uiHost={POSTHOG_UI_HOST}
+            requireConsent={siteConfig.analytics.enableConsentBanner}
+            initialConsent={initialConsent}
+          />
+        )}
+
         <SiteHeader />
         <main id="main" tabIndex={-1}>
           {children}
         </main>
         <SiteFooter />
 
-        {ANALYTICS_ENABLED && siteConfig.analytics.reportWebVitals && (
+        {trackingEnabled && siteConfig.analytics.reportWebVitals && (
           <WebVitalsReporter />
         )}
-        {ANALYTICS_ENABLED && (
+        {trackingEnabled && (
           <ScrollDepthTracker
             thresholds={siteConfig.analytics.scrollDepthThresholds}
           />
         )}
-        {ANALYTICS_ENABLED && siteConfig.analytics.enableConsentBanner && (
+        {trackingEnabled && <AiSourceTracker />}
+        {trackingEnabled && siteConfig.analytics.enableConsentBanner && (
           <ConsentBanner />
         )}
       </body>

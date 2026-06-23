@@ -44,6 +44,9 @@ export function buildMetadata(content: Content): Metadata {
       site: siteConfig.seo.twitterHandle,
       images: ogImage ? [ogImage] : undefined,
     },
+    ...(siteConfig.seo.googleSiteVerification
+      ? { verification: { google: siteConfig.seo.googleSiteVerification } }
+      : {}),
     robots: {
       index: true,
       follow: true,

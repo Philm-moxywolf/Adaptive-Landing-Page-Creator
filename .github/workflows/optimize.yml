@@ -40,6 +40,12 @@ jobs:
           GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
           GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
           OPTIMIZER_MODEL: ${{ vars.OPTIMIZER_MODEL }}
+          # PostHog (optional) — behavioural signal
+          POSTHOG_PROJECT_ID: ${{ vars.POSTHOG_PROJECT_ID }}
+          POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
+          # Google Search Console (optional) — free SEO signal (reuses GA4 service account)
+          GSC_SITE_URL: ${{ vars.GSC_SITE_URL }}
         run: npm run optimize ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '-- --dry-run' || '' }}
 
       - name: Upload optimizer report
